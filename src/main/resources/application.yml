@@ -1,0 +1,8 @@
+# 后端项目端口
+spring:
+  profiles:
+    active: dev
+
+# Knife4j相关配置
+knife4j:
+  enable: true
