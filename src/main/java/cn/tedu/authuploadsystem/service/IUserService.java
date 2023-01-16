@@ -1,5 +1,6 @@
 package cn.tedu.authuploadsystem.service;
 
+import cn.tedu.authuploadsystem.pojo.dto.UserLoginDTO;
 import cn.tedu.authuploadsystem.pojo.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,8 @@ public interface IUserService extends IService<User> {
 
     // 添加用户的功能
     void insert(User user);
+
+    String login(UserLoginDTO userLoginDTO);
 
     // 删除用户的功能
     void deleteById(Long id);

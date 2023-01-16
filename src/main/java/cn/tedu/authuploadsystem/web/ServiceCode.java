@@ -62,7 +62,22 @@ public enum ServiceCode {
     /**
      * 错误: 查询数据异常
      */
-    ERR_SELECT(50300);
+    ERR_SELECT(50300),
+
+    /**
+     * 错误: JWT签名错误
+     */
+    ERR_JWT_SIGNATURE(60000),// ctrl + shift + U(自动转大小写)
+
+    /**
+     * 错误: JWT数据格式错误
+     */
+    ERR_JWT_MALFORMED(60100),
+
+    /**
+     * 错误: JWT已过期
+     */
+    ERR_JWT_EXPIRED(60200);
 
     private Integer value;// 声明一个变量,代表每个枚举对应的状态码
 
