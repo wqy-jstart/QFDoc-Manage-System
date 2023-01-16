@@ -4,6 +4,7 @@ package cn.tedu.authuploadsystem.service.impl;
 import cn.tedu.authuploadsystem.ex.ServiceException;
 import cn.tedu.authuploadsystem.mapper.UserMapper;
 import cn.tedu.authuploadsystem.pojo.dto.UserLoginDTO;
+import cn.tedu.authuploadsystem.pojo.dto.UserUpdateDTO;
 import cn.tedu.authuploadsystem.pojo.entity.User;
 import cn.tedu.authuploadsystem.security.AdminDetails;
 import cn.tedu.authuploadsystem.service.IUserService;
@@ -15,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -158,10 +160,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
      * @param user 要修改的用户信息
      */
     @Override
-    public void update(User user) {
-        log.debug("开始处理修改id为{}的用户信息",user.getId());
-        log.debug("开始处理修改用户的功能！参数：{}",user);
-        User queryUser = userMapper.selectById(user.getId());
+    public void update(UserUpdateDTO userUpdateDTO) {
+        log.debug("开始处理修改id为{}的用户信息",userUpdateDTO.getId());
+        User queryUser = userMapper.selectById(userUpdateDTO.getId());
         if (queryUser == null){
             String message = "用户修改失败，该用户不存在!";
             log.debug(message);
@@ -169,6 +170,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements IUs
         }
 
         log.debug("即将修改用户信息...");
+        User user = new User();
+        BeanUtils.copyProperties(userUpdateDTO,user);
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("id",user.getId());
         int rows = userMapper.update(user, wrapper);

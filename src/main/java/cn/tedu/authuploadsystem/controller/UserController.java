@@ -1,9 +1,22 @@
 package cn.tedu.authuploadsystem.controller;
 
+import cn.tedu.authuploadsystem.pojo.dto.UserLoginDTO;
+import cn.tedu.authuploadsystem.pojo.dto.UserUpdateDTO;
+import cn.tedu.authuploadsystem.pojo.entity.User;
+import cn.tedu.authuploadsystem.service.IUserService;
+import cn.tedu.authuploadsystem.web.JsonResult;
+import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.hibernate.validator.constraints.Range;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 用户的控制器类
@@ -14,9 +27,103 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Api(tags = "用户管理模块")
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
+    // 注入用户的业务层接口类
+    @Autowired
+    private IUserService userService;
 
+    public UserController() {
+        log.debug("创建控制器对象：UserController");
+    }
+
+    /**
+     * 用户注册的请求
+     *
+     * @param user 用户的注册信息
+     * @return 返回结果集
+     */
+    @ApiOperation("用户注册")
+    @ApiOperationSupport(order = 100)
+    @PostMapping("/insert")
+    public JsonResult<Void> insert(@Valid User user) {
+        log.debug("开始处理用户注册的功能！参数：{}", user);
+        userService.insert(user);
+        return JsonResult.ok();
+    }
+
+    /**
+     * 处理用户登录的请求
+     *
+     * @param userLoginDTO 用户登录的信息
+     * @return 返回JWT
+     */
+    @ApiOperation("用户登录")
+    @ApiOperationSupport(order = 200)
+    @PostMapping("/login")
+    public JsonResult<String> login(@Valid UserLoginDTO userLoginDTO) {
+        log.debug("开始处理用户登录的功能，用户登录的信息：{}", userLoginDTO);
+        String login = userService.login(userLoginDTO);
+        return JsonResult.ok(login);
+    }
+
+    @ApiOperation("根据id删除用户信息")
+    @ApiOperationSupport(order = 300)
+    @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "long")
+    @PostMapping("/{id:[0-9]+}/deleteById")
+    public JsonResult<Void> deleteById(@Range(min = 1, message = "删除失败,参数无效!")
+                                       @PathVariable Long id) {
+        log.debug("开始处理根据id{}删除用户信息的功能", id);
+        userService.deleteById(id);
+        return JsonResult.ok();
+    }
+
+    /**
+     * 开始处理根据用户id修改用户的请求
+     *
+     * @param userUpdateDTO 用户信息
+     * @return 返回结果集
+     */
+    @ApiOperation("根据id修改用户")
+    @ApiOperationSupport(order = 400)
+    @PostMapping("/update")
+    public JsonResult<Void> update(@Valid UserUpdateDTO userUpdateDTO) {
+        log.debug("开始处理根据id{}修改用户信息的请求", userUpdateDTO.getId());
+        userService.update(userUpdateDTO);
+        return JsonResult.ok();
+    }
+
+    /**
+     * 根据id查询用户信息的请求
+     *
+     * @param id 用户id
+     * @return 返回用户信息
+     */
+    @ApiOperation("根据id查询用户")
+    @ApiOperationSupport(order = 500)
+    @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "long")
+    @GetMapping("/{id:[0-9]+}/selectById")
+    public JsonResult<User> selectById(@Range(min = 1, message = "查询失败,参数无效!")
+                                       @PathVariable Long id) {
+        log.debug("开始处理查询id为{}的用户业务", id);
+        User user = userService.selectById(id);
+        return JsonResult.ok(user);
+    }
+
+    /**
+     * 开始处理查询用户列表的请求
+     *
+     * @return 返回查询的用户列表信息
+     */
+    @ApiOperation("查询用户列表")
+    @ApiOperationSupport(order = 501)
+    @GetMapping("/selectList")
+    public JsonResult<List<User>> selectList() {
+        log.debug("开始处理查询用户列表的功能,无参!");
+        List<User> users = userService.selectList();
+        return JsonResult.ok(users);
+    }
 }
