@@ -14,7 +14,9 @@ import com.qiniu.util.Auth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,15 +39,19 @@ import java.io.FileOutputStream;
 @RequestMapping("/upload")
 public class UploadController {
 
+    @Value("${image.dirPath}")
+    private String dirPath;
+
     //处理文件上传
     @ApiOperation("文件上传")
     @ApiOperationSupport(order = 100)
     @PostMapping("/image")
     public JsonResult<String> uploadImg(MultipartFile file) throws JSONException {
+        System.out.println("图片名称:" + file);
         String contentType = file.getContentType();
         System.out.print(contentType); // 输出文件正文类型
         String fileName = System.currentTimeMillis() + file.getOriginalFilename();
-        String filePath = "D:/Auth";
+        String filePath = dirPath;// 文件存储的路径
         if (file.isEmpty()) {
             fileName = "";
         }
@@ -83,10 +89,23 @@ public class UploadController {
             Response response = uploadManager.put(localFilePath, fileName, upToken);
             // 解析上传成功的结果
             DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
-            System.out.println(putRet.key);
+            System.out.println(putRet.key); // 上传成功后的文件名
             System.out.println(putRet.hash);
         } catch (QiniuException ex) {
             System.out.println("出现QuniuException异常！");
+        }
+    }
+
+    // 删除文件
+    @ApiOperation("删除上传的图片")
+    @ApiOperationSupport(order = 200)
+    @GetMapping("/remove")
+    public void remove(String url) {
+        log.debug("开始处理删除图片的请求...路径:{}", url);
+        if (new File(dirPath + "/" + url).delete()) {//File对象的delete()方法,返回值boolean
+            System.out.println("删除成功!");
+        } else {
+            System.out.println("删除失败!");
         }
     }
 }

@@ -29,3 +29,5 @@ auth:
 logging:
   level:
     cn.tedu.authuploadsystem: trace
+image:
+  dirPath: D:\Auth
