@@ -24,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * 上传图片到七牛云
@@ -48,15 +50,10 @@ public class UploadController {
     @PostMapping("/image")
     public JsonResult<String> uploadImg(MultipartFile file) throws JSONException {
         System.out.println("图片名称:" + file);
-        String contentType = file.getContentType();
-        System.out.print(contentType); // 输出文件正文类型
-        String fileName = System.currentTimeMillis() + file.getOriginalFilename();
-        String filePath = dirPath;// 文件存储的路径
-        if (file.isEmpty()) {
-            fileName = "";
-        }
+        String fileName = System.currentTimeMillis()+file.getOriginalFilename();
         try {
-            uploadFile(file.getBytes(), filePath, fileName);
+            uploadFile(fileName.getBytes(), dirPath , fileName);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -71,12 +68,12 @@ public class UploadController {
             String message = mkdirs ? "创建文件成功" : "创建文件失败";
             System.out.println(message);
         }
-        FileOutputStream out = new FileOutputStream(filePath + "/" + fileName);
+        FileOutputStream out = new FileOutputStream(filePath + "/" + fileName);// 创建文件输出流，指定需要写入的文件路径
         out.write(file);
-        out.flush();
-        out.close();
-        Configuration cfg = new Configuration(Zone.zone2());
-        UploadManager uploadManager = new UploadManager(cfg);
+        out.flush(); // 刷新文件输出流
+        out.close(); // 关闭文件输出流
+        Configuration cfg = new Configuration(Zone.zone2()); // 创建配置，传入区域
+        UploadManager uploadManager = new UploadManager(cfg); // 创建上传信息，传入区域
 
         String accessKey = "ezgtMB0XLRrugRqaeg1NiyLFI3O0eoVyj8y0fUQT"; // AccessKey的值
         String secretKey = "Bz_jGB3IGhGTTGnVIAF2vyniKshV2Wx9ttX0bc9_"; // SecretKey的值
@@ -84,14 +81,14 @@ public class UploadController {
         String localFilePath = filePath + "/" + fileName; // 上传图片路径
 
         Auth auth = Auth.create(accessKey, secretKey);
-        String upToken = auth.uploadToken(bucket);
+        String upToken = auth.uploadToken(bucket); // 上传文件时生成的凭证Token
         try {
             Response response = uploadManager.put(localFilePath, fileName, upToken);
             // 解析上传成功的结果
             DefaultPutRet putRet = new Gson().fromJson(response.bodyString(), DefaultPutRet.class);
             System.out.println(putRet.key); // 上传成功后的文件名
-            System.out.println(putRet.hash);
-        } catch (QiniuException ex) {
+            System.out.println(putRet.hash); // 上传成功后的hash值
+        } catch (QiniuException ex) { // 手动捕获一个异常
             System.out.println("出现QuniuException异常！");
         }
     }
