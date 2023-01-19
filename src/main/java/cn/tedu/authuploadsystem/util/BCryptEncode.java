@@ -6,10 +6,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 /**
- * 利用BCrypt解码的工具类
+ * BCrypt加密解码的工具类
  *
  * @author java@Wqy
  * @version 0.0.1
+ * @since 2023.1.19
  */
 @Slf4j
 public class BCryptEncode {

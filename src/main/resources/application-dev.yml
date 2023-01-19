@@ -9,6 +9,11 @@ spring:
     username: root
     password: root
 
+  #设置上传文件大小  默认1MB
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
 #配置日志  log-impl:日志实现
 mybatis-plus:
   configuration:
@@ -24,6 +29,14 @@ auth:
     secret-key: a9F8ujGDhjgFvfEd3SA90ukDS
     # JWT的有效时长,以分钟为单位
     duration-in-minute: 14400
+  # 认证钥匙配置
+  key:
+    # AK
+    accessKey: ezgtMB0XLRrugRqaeg1NiyLFI3O0eoVyj8y0fUQT
+    # SK
+    secretKey: Bz_jGB3IGhGTTGnVIAF2vyniKshV2Wx9ttX0bc9_
+    # 地域值
+    storageArea: z2
 
 # 日志的显示级别默认info(根包尽量这样写,若简写会扩大不必要的范围,多写比较麻烦)
 logging:
