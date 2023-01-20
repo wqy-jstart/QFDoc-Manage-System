@@ -47,8 +47,23 @@ public class BucketController {
     @ApiImplicitParam(name = "bucketName",value = "空间名",required = true,dataType = "string")
     @PostMapping("/{bucketName}/create")
     public JsonResult<String> createBucket(@PathVariable String bucketName) {
-        log.debug("接受传递的空间名为："+bucketName);
+        log.debug("开始处理创建存储空间的请求，参数：{}"+bucketName);
         String bucket = bucketService.createBucket(bucketName);
         return JsonResult.ok(bucket);
+    }
+
+    /**
+     * 删除存储空间
+     * @param bucketName 存储空间的名称
+     * @return 返回操作的结果状态码
+     */
+    @ApiOperation("删除存储空间")
+    @ApiOperationSupport(order = 200)
+    @ApiImplicitParam(name = "bucketName",value = "存储空间名称",required = true,dataType = "string")
+    @PostMapping("/{bucketName}/drop")
+    public JsonResult<String> dropBucket(@PathVariable String bucketName){
+        log.debug("开始处理删除存储空间的请求，参数：{}",bucketName);
+        String s = bucketService.dropBucket(bucketName);
+        return JsonResult.ok(s);
     }
 }

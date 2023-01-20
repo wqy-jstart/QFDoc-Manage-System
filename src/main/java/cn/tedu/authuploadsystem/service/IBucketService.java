@@ -19,4 +19,11 @@ public interface IBucketService {
      * @return 返回创建的状态码
      */
     String createBucket(String bucketName);
+
+    /**
+     * 删除存储空间
+     * @param bucketName 存储空间的名称
+     * @return 返回操作返回的状态码
+     */
+    String dropBucket(String bucketName);
 }

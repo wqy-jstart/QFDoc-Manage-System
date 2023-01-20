@@ -67,4 +67,30 @@ public class BucketServiceImpl implements IBucketService {
         }
         return re.code()+""; // 将状态码返回给用户
     }
+
+    @Override
+    public String dropBucket(String bucketName) {
+        log.debug("开始处理删除存储空间：{}的功能",bucketName);
+        Auth auth = Auth.create(accessKey,secretKey);// 将AK和SK传入进行认证
+        String path = "/drop/" + bucketName+"\n";
+        String access_token = auth.sign(path);
+        System.out.println(access_token);
+        String url = "http://rs.qiniu.com/drop/" + bucketName;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("Authorization", "QBox " + access_token).build();
+        Response re = null;
+        try {
+            re = client.newCall(request).execute();
+            if (re.isSuccessful() == true) { // 判断执行结果是否成功！
+                System.out.println(re.code());
+                System.out.println(re.toString());
+            } else {
+                System.out.println(re.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return re.code()+""; // 将状态码返回给用户
+    }
 }
