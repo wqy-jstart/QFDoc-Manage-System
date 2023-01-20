@@ -1,7 +1,10 @@
 package cn.tedu.authuploadsystem.service;
 
+import cn.tedu.authuploadsystem.pojo.entity.Bucket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 存储空间的业务层接口类
@@ -26,4 +29,11 @@ public interface IBucketService {
      * @return 返回操作返回的状态码
      */
     String dropBucket(String bucketName);
+
+    /**
+     * 根据指定的存储空间查询该空间内所有的文件
+     * @param bucketName 存储空间名
+     * @return 返回该空间内所有的文件列表
+     */
+    List<Bucket> bucketList(String bucketName);
 }

@@ -1,7 +1,12 @@
 package cn.tedu.authuploadsystem.service.impl;
 
+import cn.tedu.authuploadsystem.pojo.entity.Bucket;
 import cn.tedu.authuploadsystem.service.IBucketService;
 import cn.tedu.authuploadsystem.util.BASE64Encoder;
+import com.qiniu.common.Zone;
+import com.qiniu.storage.BucketManager;
+import com.qiniu.storage.Configuration;
+import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -11,6 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 存储空间的业务层接口实现类
@@ -33,20 +40,21 @@ public class BucketServiceImpl implements IBucketService {
     @Value("${auth.key.storageArea}")
     private String storageArea;
 
-    public BucketServiceImpl(){
+    public BucketServiceImpl() {
         log.debug("创建业务层接口实现类：BucketServiceImpl");
     }
 
     /**
      * 创建存储空间的实现方法
+     *
      * @param bucketName 空间名
      * @return 返回创建的状态码
      */
     @Override
     public String createBucket(String bucketName) {
-        log.debug("开始处理创建存储空间的功能，参数：{}",bucketName);
-        Auth auth = Auth.create(accessKey,secretKey);// 将AK和SK传入进行认证
-        String path = "/mkbucketv2/" + BASE64Encoder.encode(bucketName.getBytes()) + "/region/"+ storageArea +"\n";
+        log.debug("开始处理创建存储空间的功能，参数：{}", bucketName);
+        Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
+        String path = "/mkbucketv2/" + BASE64Encoder.encode(bucketName.getBytes()) + "/region/" + storageArea + "\n";
         String access_token = auth.sign(path);
         System.out.println(access_token);
         String url = "http://rs.qiniu.com/mkbucketv2/" + BASE64Encoder.encode(bucketName.getBytes()) + "/region/" + storageArea;
@@ -65,14 +73,20 @@ public class BucketServiceImpl implements IBucketService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return re.code()+""; // 将状态码返回给用户
+        return re.code() + ""; // 将状态码返回给用户
     }
 
+    /**
+     * 处理删除存储空间的功能
+     *
+     * @param bucketName 存储空间的名称
+     * @return 返回操作的结果状态码
+     */
     @Override
     public String dropBucket(String bucketName) {
-        log.debug("开始处理删除存储空间：{}的功能",bucketName);
-        Auth auth = Auth.create(accessKey,secretKey);// 将AK和SK传入进行认证
-        String path = "/drop/" + bucketName+"\n";
+        log.debug("开始处理删除存储空间：{}的功能", bucketName);
+        Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
+        String path = "/drop/" + bucketName + "\n";
         String access_token = auth.sign(path);
         System.out.println(access_token);
         String url = "http://rs.qiniu.com/drop/" + bucketName;
@@ -91,6 +105,46 @@ public class BucketServiceImpl implements IBucketService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return re.code()+""; // 将状态码返回给用户
+        return re.code() + ""; // 将状态码返回给用户
+    }
+
+    /**
+     * 处理查询指定存储空间的文件列表信息
+     *
+     * @param bucketName 存储空间名
+     * @return 返回文件列表
+     */
+    @Override
+    public List<Bucket> bucketList(String bucketName) {
+        log.debug("开始处理查询存储空间：{}的文件列表", bucketName);
+        //构造一个带指定Zone对象的配置类
+        Configuration cfg = new Configuration(Zone.zone2());
+        //...其他参数参考类注释
+        Auth auth = Auth.create(accessKey, secretKey);
+        BucketManager bucketManager = new BucketManager(auth, cfg);
+        //文件名前缀
+        String prefix = "";
+        //每次迭代的长度限制，最大1000，推荐值 1000
+        int limit = 1000;
+        //指定目录分隔符，列出所有公共前缀（模拟列出目录效果）。缺省值为空字符串
+        String delimiter = "";
+        //列举空间文件列表
+        BucketManager.FileListIterator fileListIterator = bucketManager.createFileListIterator(bucketName, prefix, limit, delimiter);
+        List<Bucket> keyList = new ArrayList<>();
+        while (fileListIterator.hasNext()) {
+            //处理获取的file list结果
+            FileInfo[] items = fileListIterator.next();
+            for (FileInfo item : items) {
+                Bucket bucket = new Bucket();
+                bucket.setKey(item.key);
+                bucket.setHash(item.hash);
+                bucket.setFsize(item.fsize);
+                bucket.setMimeType(item.mimeType);
+                bucket.setPutTime(item.putTime);
+                bucket.setType(item.type);
+                keyList.add(bucket);
+            }
+        }
+        return keyList; // 返回List列表
     }
 }
