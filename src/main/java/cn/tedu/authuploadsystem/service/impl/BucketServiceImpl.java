@@ -1,8 +1,10 @@
 package cn.tedu.authuploadsystem.service.impl;
 
+import cn.tedu.authuploadsystem.ex.ServiceException;
 import cn.tedu.authuploadsystem.pojo.entity.Bucket;
 import cn.tedu.authuploadsystem.service.IBucketService;
 import cn.tedu.authuploadsystem.util.BASE64Encoder;
+import cn.tedu.authuploadsystem.web.ServiceCode;
 import com.qiniu.common.Zone;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -134,11 +137,15 @@ public class BucketServiceImpl implements IBucketService {
         while (fileListIterator.hasNext()) {
             //处理获取的file list结果
             FileInfo[] items = fileListIterator.next();
+            if (items == null){ // 捕获该异常，放到Spring MVC框架的全局异常处理器"ExceptionHandler"进行响应处理
+                String message = "该存储空间不存在！";
+                throw new ServiceException(ServiceCode.ERR_NOT_FOUND,message);
+            }
             for (FileInfo item : items) {
                 Bucket bucket = new Bucket();
                 bucket.setKey(item.key);
                 bucket.setHash(item.hash);
-                bucket.setFsize(item.fsize);
+                bucket.setSize(item.fsize);
                 bucket.setMimeType(item.mimeType);
                 bucket.setPutTime(item.putTime);
                 bucket.setType(item.type);

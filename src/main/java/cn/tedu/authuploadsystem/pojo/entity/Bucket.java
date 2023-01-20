@@ -31,7 +31,7 @@ public class Bucket implements Serializable {
      * 文件大小
      */
     @ApiModelProperty(value = "文件大小")
-    private long fsize;
+    private long size;
 
     /**
      * 文件上传时间
