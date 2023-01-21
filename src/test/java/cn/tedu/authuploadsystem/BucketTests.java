@@ -99,10 +99,66 @@ public class BucketTests {
     }
 
     /**
-     * 获取存储空间列表
+     * 删除文件(已完成！)
+     * 612:指定资源不存在或已被删除
      */
     @Test
-    public void bucketList(){
+    public void deleteToFile() {
+        String bucketName = "jstart";
+        String fileName = "1674115449345tunshi.webp";
+        String entry = bucketName + ":" + fileName;
+        Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
+        String path = "/delete/" + BASE64Encoder.encode(entry.getBytes()) + "\n";
+        log.debug("请求的路径为：" + path);
+        String access_token = auth.sign(path);
+        System.out.println(access_token);
+        String url = "http://rs.qiniuapi.com/delete/" + BASE64Encoder.encode(entry.getBytes());
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("Authorization", "QBox " + access_token).build();
+        Response re = null;
+        try {
+            re = client.newCall(request).execute();
+            if (re.isSuccessful() == true) { // 判断执行结果是否成功！
+                System.out.println(re.code());
+                System.out.println(re.toString());
+            } else {
+                System.out.println(re.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    /**
+     * 修改文件存储状态(已完成！)
+     */
+    @Test
+    public void setFileStatus() {
+        String bucketName = "jstart";
+        String fileName = "1674128424063多用户文档管理系统.md";
+        int status = 1; // 0表示启用，1表示禁用
+        String entry = bucketName + ":" + fileName;
+        Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
+        String path = "/chstatus/" + BASE64Encoder.encode(entry.getBytes()) + "/status/" + status + "\n";
+        log.debug("请求的路径为：" + path);
+        String access_token = auth.sign(path);
+        System.out.println(access_token);
+        String url = "http://rs.qiniuapi.com/chstatus/" + BASE64Encoder.encode(entry.getBytes()) + "/status/" + status;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("Authorization", "QBox " + access_token).build();
+        Response re = null;
+        try {
+            re = client.newCall(request).execute();
+            if (re.isSuccessful() == true) { // 判断执行结果是否成功！
+                System.out.println(re.code());
+                System.out.println(re.toString());
+            } else {
+                System.out.println(re.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
