@@ -36,4 +36,18 @@ public interface IBucketService {
      * @return 返回该空间内所有的文件列表
      */
     List<Bucket> bucketList(String bucketName);
+
+    /**
+     * 设置公开Bucket存储权限
+     * @param bucketName 存储空间名
+     * @return 返回状态码
+     */
+    String setBucketPublic(String bucketName);
+
+    /**
+     * 设置私有Bucket存储权限
+     * @param bucketName 存储空间名
+     * @return 返回状态码
+     */
+    String setBucketPrivate(String bucketName);
 }

@@ -137,9 +137,9 @@ public class BucketServiceImpl implements IBucketService {
         while (fileListIterator.hasNext()) {
             //处理获取的file list结果
             FileInfo[] items = fileListIterator.next();
-            if (items == null){ // 捕获该异常，放到Spring MVC框架的全局异常处理器"ExceptionHandler"进行响应处理
+            if (items == null) { // 捕获该异常，放到Spring MVC框架的全局异常处理器"ExceptionHandler"进行响应处理
                 String message = "该存储空间不存在！";
-                throw new ServiceException(ServiceCode.ERR_NOT_FOUND,message);
+                throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
             }
             for (FileInfo item : items) {
                 Bucket bucket = new Bucket();
@@ -153,5 +153,58 @@ public class BucketServiceImpl implements IBucketService {
             }
         }
         return keyList; // 返回List列表
+    }
+
+    /**
+     * 设置Bucket公开访问权限
+     * @param bucketName 存储空间名
+     * @return 返回结果状态码
+     */
+    @Override
+    public String setBucketPublic(String bucketName) {
+        return setBucketAuth(bucketName, 0);
+    }
+
+    /**
+     * 设置Bucket私有访问权限
+     * @param bucketName 存储空间名
+     * @return 返回结果状态码
+     */
+    @Override
+    public String setBucketPrivate(String bucketName) {
+        return setBucketAuth(bucketName, 1);
+    }
+
+    /**
+     * 处理设置存储空间访问权限的逻辑
+     * @param bucketName 存储空间的名称
+     * @param authId 权限Id
+     * @return 返回结果状态码
+     */
+    private String setBucketAuth(String bucketName, Integer authId) {
+        String[] tips = {"公开", "私有"};
+        log.debug("您要设置Bucket空间名：{}的存储权限为：{}", bucketName, tips[authId]);
+        Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
+        String path = "/private?bucket=" + bucketName + "&private=" + authId + "\n";
+        log.debug("请求的路径为：" + path);
+        String access_token = auth.sign(path);
+        System.out.println(access_token);
+        String url = "http://uc.qiniuapi.com/private?bucket=" + bucketName + "&private=" + authId;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("Authorization", "QBox " + access_token).build();
+        Response re = null;
+        try {
+            re = client.newCall(request).execute();
+            if (re.isSuccessful() == true) { // 判断执行结果是否成功！
+                System.out.println(re.code());
+                System.out.println(re.toString());
+            } else {
+                System.out.println(re.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return re.code() + "";
     }
 }

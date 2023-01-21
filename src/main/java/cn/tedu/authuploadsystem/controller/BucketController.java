@@ -2,22 +2,17 @@ package cn.tedu.authuploadsystem.controller;
 
 import cn.tedu.authuploadsystem.pojo.entity.Bucket;
 import cn.tedu.authuploadsystem.service.IBucketService;
-import cn.tedu.authuploadsystem.util.BASE64Encoder;
 import cn.tedu.authuploadsystem.web.JsonResult;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
-import com.qiniu.util.Auth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -80,5 +75,29 @@ public class BucketController {
         log.debug("开始处理查询存储空间：{}的文件列表",bucketName);
         List<Bucket> buckets = bucketService.bucketList(bucketName);
         return JsonResult.ok(buckets);
+    }
+
+    @ApiOperation("设置空间公开权限")
+    @ApiOperationSupport(order = 400)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "bucketName",value = "存储空间名",required = true,dataType = "string")
+    })
+    @PostMapping("/{bucketName}/setBucketPublic")
+    public JsonResult<String> setBucketPublic(@PathVariable String bucketName){
+        log.debug("开始处理设置存储空间：{}的访问权限为公开！",bucketName);
+        String result = bucketService.setBucketPublic(bucketName);
+        return JsonResult.ok(result);
+    }
+
+    @ApiOperation("设置空间私有权限")
+    @ApiOperationSupport(order = 401)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "bucketName",value = "存储空间名",required = true,dataType = "string")
+    })
+    @PostMapping("/{bucketName}/setBucketPrivate")
+    public JsonResult<String> setBucketPrivate(@PathVariable String bucketName){
+        log.debug("开始处理设置存储空间：{}的访问权限为私有！",bucketName);
+        String result = bucketService.setBucketPrivate(bucketName);
+        return JsonResult.ok(result);
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +34,9 @@ public class BucketTests {
     @Value("${auth.key.secretKey}")
     private String secretKey;
 
+    /**
+     * 测试查询列表
+     */
     @Test
     public void list() {
         //构造一个带指定Zone对象的配置类
@@ -64,15 +68,19 @@ public class BucketTests {
         }
     }
 
+    /**
+     * 测试设置存储权限
+     */
     @Test
-    public void setPrivate(){
-        String bucketName = "jstart";
+    public void setPrivate() {
+        String bucketName = "jstart7";
         int privateId = 1;
         Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
         String path = "/private?bucket=" + bucketName + "&private=" + privateId + "\n";
+        log.debug("请求的路径为：" + path);
         String access_token = auth.sign(path);
         System.out.println(access_token);
-        String url = "http://rs.qiniu.com/private?bucket=" + bucketName + "&private=" + privateId;
+        String url = "http://uc.qiniuapi.com/private?bucket=" + bucketName + "&private=" + privateId;
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .addHeader("Authorization", "QBox " + access_token).build();
@@ -88,5 +96,13 @@ public class BucketTests {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 获取存储空间列表
+     */
+    @Test
+    public void bucketList(){
+
     }
 }
