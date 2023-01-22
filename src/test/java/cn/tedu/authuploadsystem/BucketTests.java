@@ -1,6 +1,8 @@
 package cn.tedu.authuploadsystem;
 
+import cn.tedu.authuploadsystem.ex.ServiceException;
 import cn.tedu.authuploadsystem.util.BASE64Encoder;
+import cn.tedu.authuploadsystem.web.ServiceCode;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import com.qiniu.common.Zone;
 import com.qiniu.storage.BucketManager;
@@ -156,6 +158,43 @@ public class BucketTests {
                 System.out.println(re.toString());
             } else {
                 System.out.println(re.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void copyToFile(){
+        String buckName = "jstart";
+        String nowFileName = "1674131709841kj.jpg";
+        String lastFileName = "a.jpg";
+        String EncodedEntryURISrc = buckName+":"+nowFileName;
+        String EncodedEntryURIDest = buckName+":"+lastFileName;
+        boolean isCover = true;// 禁止直接覆盖
+        Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
+        String path = "/copy/"+BASE64Encoder.encode(EncodedEntryURISrc.getBytes())+"/"+BASE64Encoder.encode(EncodedEntryURIDest.getBytes())+"/force/" + isCover + "\n";
+        log.debug("请求的路径为：" + path);
+        String access_token = auth.sign(path);
+        System.out.println(access_token);
+        String url = "http://rs.qiniuapi.com/copy/"+BASE64Encoder.encode(EncodedEntryURISrc.getBytes())+"/"+BASE64Encoder.encode(EncodedEntryURIDest.getBytes())+"/force/" + isCover;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("Authorization", "QBox " + access_token).build();
+        okhttp3.Response re = null;
+        try {
+            re = client.newCall(request).execute();
+            if (re.isSuccessful()) { // 判断执行结果是否成功！
+                System.out.println(re.code());
+                System.out.println(re.toString());
+            } else {
+                if (re.code() == 614) {
+                    String message = "设置失败，目标文件名已经存在！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                }else if (re.code() == 612){
+                    String message = "设置失败，源文件不存在或被删除！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT,message);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

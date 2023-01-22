@@ -1,5 +1,6 @@
 package cn.tedu.authuploadsystem.controller;
 
+import cn.tedu.authuploadsystem.pojo.entity.CopyToFile;
 import cn.tedu.authuploadsystem.service.IFileService;
 import cn.tedu.authuploadsystem.web.JsonResult;
 import com.alibaba.fastjson.JSONException;
@@ -15,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.File;
 
 /**
@@ -133,6 +135,21 @@ public class FileController {
                                                      @PathVariable String key){
         log.debug("开始处理存储空间：{}的文件：{}的存储状态为禁用",bucketName,key);
         String statusId = fileService.setFileStatusToDisable(bucketName, key);
+        return JsonResult.ok(statusId);
+    }
+
+    /**
+     * 复制文件
+     * @param copyToFile 复制的所有文件信息
+     * @return 返回结果状态码
+     */
+    @ApiOperation("复制文件")
+    @ApiOperationSupport(order = 403)
+    @PostMapping("/copyToFile")
+    public JsonResult<String> copyToFile(@Valid CopyToFile copyToFile){
+        log.debug("开始处理复制文件的请求---存储空间名：{}；源文件：{}；目标文件：{}；是否覆盖：{}",copyToFile.getBucketName(),
+                copyToFile.getNowFileKey(),copyToFile.getLastFileKey(),copyToFile.getIsCover());
+        String statusId = fileService.copyToFile(copyToFile);
         return JsonResult.ok(statusId);
     }
 }

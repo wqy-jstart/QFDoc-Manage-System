@@ -1,5 +1,6 @@
 package cn.tedu.authuploadsystem.service;
 
+import cn.tedu.authuploadsystem.pojo.entity.CopyToFile;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -43,4 +44,11 @@ public interface IFileService {
      * @return 返回结果状态码
      */
     String setFileStatusToDisable(String bucketName,String key);
+
+    /**
+     * 复制文件
+     * @param copyToFile 复制的文件实体类
+     * @return 返回结果状态码
+     */
+    String copyToFile(CopyToFile copyToFile);
 }
