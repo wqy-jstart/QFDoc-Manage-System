@@ -67,7 +67,7 @@ public class BucketServiceImpl implements IBucketService {
         Response re = null;
         try {
             re = client.newCall(request).execute();
-            if (re.isSuccessful() == true) { // 判断执行结果是否成功！
+            if (re.isSuccessful()) { // 判断执行结果是否成功！
                 System.out.println(re.code());
                 System.out.println(re.toString());
             } else {
@@ -99,7 +99,7 @@ public class BucketServiceImpl implements IBucketService {
         Response re = null;
         try {
             re = client.newCall(request).execute();
-            if (re.isSuccessful() == true) { // 判断执行结果是否成功！
+            if (re.isSuccessful()) { // 判断执行结果是否成功！
                 System.out.println(re.code());
                 System.out.println(re.toString());
             } else {
@@ -196,7 +196,7 @@ public class BucketServiceImpl implements IBucketService {
         Response re = null;
         try {
             re = client.newCall(request).execute();
-            if (re.isSuccessful() == true) { // 判断执行结果是否成功！
+            if (re.isSuccessful()) { // 判断执行结果是否成功！
                 System.out.println(re.code());
                 System.out.println(re.toString());
             } else {
