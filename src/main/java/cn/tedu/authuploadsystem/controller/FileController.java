@@ -28,7 +28,7 @@ import java.io.File;
 @Slf4j
 @Validated
 @RestController
-@RequestMapping("/upload")
+@RequestMapping("/file")
 public class FileController {
 
     @Value("${image.dirPath}")
