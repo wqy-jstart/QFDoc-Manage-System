@@ -92,4 +92,13 @@ public interface IFileService {
      * @return 返回结果状态码
      */
     String fileToThaw(String bucketName,String fileName,String time);
+
+    /**
+     * 设置文件过期时间
+     * @param bucketName 存储空间名称
+     * @param fileName 文件名称
+     * @param days 过期时间(天)
+     * @return 返回结果状态码
+     */
+    String setOverTime(String bucketName,String fileName,Integer days);
 }

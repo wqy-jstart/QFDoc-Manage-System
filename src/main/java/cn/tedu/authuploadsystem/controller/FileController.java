@@ -261,4 +261,27 @@ public class FileController {
         String result = fileService.fileToThaw(bucketName, fileName, time);
         return JsonResult.ok(result);
     }
+
+    /**
+     * 设置过期时间
+     * @param bucketName 存储空间
+     * @param fileName 文件名
+     * @param days 时间/天
+     * @return 返回结果状态码
+     */
+    @ApiOperation("设置过期时间")
+    @ApiOperationSupport(order = 409)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "bucketName",value = "存储空间名",required = true,dataType = "string"),
+            @ApiImplicitParam(name = "fileName",value = "文件名",required = true,dataType = "string"),
+            @ApiImplicitParam(name = "days",value = "过期时间",required = true,dataType = "int"),
+    })
+    @PostMapping("/{bucketName}/{fileName}/{days:[0-9]+}/setOverTime")
+    public JsonResult<String> setOverTime(@PathVariable String bucketName,
+                                          @PathVariable String fileName,
+                                          @PathVariable Integer days){
+        log.debug("开始处理设置存储空间:{}的文件:{}过期时间为:{}天",bucketName,fileName,days);
+        String result = fileService.setOverTime(bucketName, fileName, days);
+        return JsonResult.ok(result);
+    }
 }
