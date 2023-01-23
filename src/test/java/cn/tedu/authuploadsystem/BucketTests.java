@@ -164,20 +164,24 @@ public class BucketTests {
         }
     }
 
+    /**
+     * 复制文件(已完成！)
+     * 需要选择覆盖或者不覆盖
+     */
     @Test
-    public void copyToFile(){
+    public void copyToFile() {
         String buckName = "jstart";
         String nowFileName = "1674131709841kj.jpg";
         String lastFileName = "a.jpg";
-        String EncodedEntryURISrc = buckName+":"+nowFileName;
-        String EncodedEntryURIDest = buckName+":"+lastFileName;
+        String EncodedEntryURISrc = buckName + ":" + nowFileName;
+        String EncodedEntryURIDest = buckName + ":" + lastFileName;
         boolean isCover = true;// 禁止直接覆盖
         Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
-        String path = "/copy/"+BASE64Encoder.encode(EncodedEntryURISrc.getBytes())+"/"+BASE64Encoder.encode(EncodedEntryURIDest.getBytes())+"/force/" + isCover + "\n";
+        String path = "/copy/" + BASE64Encoder.encode(EncodedEntryURISrc.getBytes()) + "/" + BASE64Encoder.encode(EncodedEntryURIDest.getBytes()) + "/force/" + isCover + "\n";
         log.debug("请求的路径为：" + path);
         String access_token = auth.sign(path);
         System.out.println(access_token);
-        String url = "http://rs.qiniuapi.com/copy/"+BASE64Encoder.encode(EncodedEntryURISrc.getBytes())+"/"+BASE64Encoder.encode(EncodedEntryURIDest.getBytes())+"/force/" + isCover;
+        String url = "http://rs.qiniuapi.com/copy/" + BASE64Encoder.encode(EncodedEntryURISrc.getBytes()) + "/" + BASE64Encoder.encode(EncodedEntryURIDest.getBytes()) + "/force/" + isCover;
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .addHeader("Authorization", "QBox " + access_token).build();
@@ -191,9 +195,59 @@ public class BucketTests {
                 if (re.code() == 614) {
                     String message = "设置失败，目标文件名已经存在！";
                     throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
-                }else if (re.code() == 612){
+                } else if (re.code() == 612) {
                     String message = "设置失败，源文件不存在或被删除！";
-                    throw new ServiceException(ServiceCode.ERROR_CONFLICT,message);
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 修改文件的存储类型
+     * 实现标准存储、低频访问存储、归档存储和深度归档存储之间的互相转换。
+     */
+    @Test
+    public void setBucketType() {
+        String buckName = "jstart";
+        String nowFileName = "1674131709841kj.jpg";
+        String EncodedEntryURI = buckName + ":" + nowFileName;
+        String type = "1"; // 存储类型编号(0 表示标准存储，1 表示低频访问存储，2 表示归档存储，3 表示深度归档存储)
+        Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
+        String path = "/chtype/" + BASE64Encoder.encode(EncodedEntryURI.getBytes()) + "/type/" + type + "\n";
+        log.debug("认证的路径为：" + path);
+        String access_token = auth.sign(path);
+        System.out.println(access_token);
+        String url = "http://rs.qiniuapi.com/chtype/" + BASE64Encoder.encode(EncodedEntryURI.getBytes()) + "/type/" + type;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("Authorization", "QBox " + access_token).build();
+        okhttp3.Response re = null;
+        try {
+            re = client.newCall(request).execute();
+            if (re.isSuccessful()) { // 判断执行结果是否成功！
+                System.out.println(re.code());
+                System.out.println(re.toString());
+            } else {
+                System.out.println("错误代码：" + re.code());
+                System.out.println(re.toString());
+                if (re.code() == 612) {
+                    String message = "设置失败，文件不存在或被删除！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                } else if (re.code() == 631) {
+                    String message = "修改失败，该空间不存在！";
+                    throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+                } else if (re.code() == 401) {
+                    String message = "认证信息有误！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                } else if (re.code() == 403) {
+                    String message = "归档存储文件未解冻完成";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                } else if (re.code() == 400) {
+                    String message = "修改失败，当前已经处于";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
                 }
             }
         } catch (IOException e) {

@@ -51,4 +51,45 @@ public interface IFileService {
      * @return 返回结果状态码
      */
     String copyToFile(CopyToFile copyToFile);
+
+    /**
+     * 修改文件的存储类型-----标椎存储
+     * @param bucketName 存储空间名称
+     * @param fileName 文件名
+     * @return 返回结果状态码
+     */
+    String setBucketType0(String bucketName,String fileName);
+
+    /**
+     * 修改文件的存储类型-----低频访问存储存储
+     * @param bucketName 存储空间名称
+     * @param fileName 文件名
+     * @return 返回结果状态码
+     */
+    String setBucketType1(String bucketName,String fileName);
+
+    /**
+     * 修改文件的存储类型-----归档存储
+     * @param bucketName 存储空间名称
+     * @param fileName 文件名
+     * @return 返回结果状态码
+     */
+    String setBucketType2(String bucketName,String fileName);
+
+    /**
+     * 修改文件的存储类型-----深度归档存储
+     * @param bucketName 存储空间名称
+     * @param fileName 文件名
+     * @return 返回结果状态码
+     */
+    String setBucketType3(String bucketName,String fileName);
+
+    /**
+     * 归档文件解冻
+     * @param bucketName 存储空间名
+     * @param fileName 文件名
+     * @param time 解冻时间（1~7）
+     * @return 返回结果状态码
+     */
+    String fileToThaw(String bucketName,String fileName,String time);
 }

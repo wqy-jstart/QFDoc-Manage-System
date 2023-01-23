@@ -134,7 +134,7 @@ public class FileServiceImpl implements IFileService {
      */
     @Override
     public String copyToFile(CopyToFile copyToFile) {
-        log.debug("处理复制文件的业务,参数：{}",copyToFile);
+        log.debug("处理复制文件的业务,参数：{}", copyToFile);
         // 如果isCover为false，目标文件存在时会抛出614
         String EncodedEntryURISrc = copyToFile.getBucketName() + ":" + copyToFile.getNowFileKey();
         String EncodedEntryURIDest = copyToFile.getBucketName() + ":" + copyToFile.getLastFileKey();
@@ -160,6 +160,113 @@ public class FileServiceImpl implements IFileService {
                     throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
                 } else if (re.code() == 612) {
                     String message = "设置失败，源文件不存在或被删除！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return re.code() + "";
+    }
+
+    /**
+     * 修改标准存储类型
+     *
+     * @param bucketName 存储空间名称
+     * @param fileName   文件名
+     * @return 返回结果状态码
+     */
+    @Override
+    public String setBucketType0(String bucketName, String fileName) {
+        return setBucketType(bucketName, fileName, 0);
+    }
+
+    /**
+     * 修改低频访问存储
+     *
+     * @param bucketName 存储空间名称
+     * @param fileName   文件名
+     * @return 返回结果状态码
+     */
+    @Override
+    public String setBucketType1(String bucketName, String fileName) {
+        return setBucketType(bucketName, fileName, 1);
+    }
+
+    /**
+     * 修改归档存储类型
+     *
+     * @param bucketName 存储空间名称
+     * @param fileName   文件名
+     * @return 返回结果状态码
+     */
+    @Override
+    public String setBucketType2(String bucketName, String fileName) {
+        return setBucketType(bucketName, fileName, 2);
+    }
+
+    /**
+     * 修改深度归档存储类型
+     *
+     * @param bucketName 存储空间名称
+     * @param fileName   文件名
+     * @return 返回结果状态码
+     */
+    @Override
+    public String setBucketType3(String bucketName, String fileName) {
+        return setBucketType(bucketName, fileName, 3);
+    }
+
+    @Override
+    public String fileToThaw(String bucketName, String fileName, String time) {
+        return null;
+    }
+
+    /**
+     * 处理修改文件存储类型的功能
+     *
+     * @param bucketName 空间名称
+     * @param fileName   文件名
+     * @param typeId     类型Id
+     * @return 返回结果状态码
+     */
+    private String setBucketType(String bucketName, String fileName, Integer typeId) {
+        String[] tips = {"标椎存储", "低频访问存储", "归档存储", "深度归档存储"};
+        log.debug("开始处理修改存储空间：{}中的文件：{}，类型为：{}", bucketName, fileName, tips[typeId]);
+        String EncodedEntryURI = bucketName + ":" + fileName;
+        int type = typeId; // 存储类型编号(0 表示标准存储，1 表示低频访问存储，2 表示归档存储，3 表示深度归档存储)
+        Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
+        String path = "/chtype/" + BASE64Encoder.encode(EncodedEntryURI.getBytes()) + "/type/" + type + "\n";
+        log.debug("认证的路径为：" + path);
+        String access_token = auth.sign(path);
+        System.out.println(access_token);
+        String url = "http://rs.qiniuapi.com/chtype/" + BASE64Encoder.encode(EncodedEntryURI.getBytes()) + "/type/" + type;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("Authorization", "QBox " + access_token).build();
+        okhttp3.Response re = null;
+        try {
+            re = client.newCall(request).execute();
+            if (re.isSuccessful()) { // 判断执行结果是否成功！
+                System.out.println(re.code());
+                System.out.println(re.toString());
+            } else {
+                System.out.println("错误代码：" + re.code());
+                System.out.println(re.toString());
+                if (re.code() == 612) {
+                    String message = "设置失败，文件不存在或被删除！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                } else if (re.code() == 631) {
+                    String message = "修改失败，该空间不存在！";
+                    throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+                } else if (re.code() == 401) {
+                    String message = "认证信息有误！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                } else if (re.code() == 403) {
+                    String message = "归档存储文件未解冻完成";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                } else if (re.code() == 400) {
+                    String message = "修改失败，当前已经处于" + tips[typeId];
                     throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
                 }
             }

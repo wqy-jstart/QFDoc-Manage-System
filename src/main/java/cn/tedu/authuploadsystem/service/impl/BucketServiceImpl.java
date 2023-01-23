@@ -71,7 +71,22 @@ public class BucketServiceImpl implements IBucketService {
                 System.out.println(re.code());
                 System.out.println(re.toString());
             } else {
-                System.out.println(re.code());
+                if (re.code() == 614) {
+                    String message = "创建失败，该空间名已存在！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                } else if (re.code() == 631) {
+                    String message = "创建失败，该空间名不存在！";
+                    throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+                }else if(re.code() == 400){
+                    String message = "创建失败，不符合命名规范！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT,message);
+                }else if(re.code() == 401){
+                    String message = "认证信息有误！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT,message);
+                }else if(re.code() == 630){
+                    String message = "已创建的空间数量达到上限，无法创建新空间";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT,message);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
