@@ -310,7 +310,7 @@ public class FileServiceImpl implements IFileService {
                     String message = "认证信息有误！";
                     throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
                 } else if (re.code() == 403) {
-                    String message = "归档存储文件未解冻完成";
+                    String message = "归档存储文件未解冻完成,请前往解冻!";
                     throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
                 } else if (re.code() == 400) {
                     String message = "修改失败，当前已经处于" + tips[typeId];
