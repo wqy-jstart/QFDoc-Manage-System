@@ -18,6 +18,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,16 +52,16 @@ public class FileServiceImpl implements IFileService {
     /**
      * 上传图片
      *
-     * @param fileName   图片名称
+     * @param file       图片名称
      * @param bucketName 空间名称
      * @return 返回文件名
      */
     @Override
-    public String uploadImage(String fileName, String bucketName) {
-        log.debug("开始处理上传图片文件的功能，参数：{}", fileName);
+    public String uploadImage(MultipartFile file, String fileName, String bucketName) {
+        log.debug("开始处理上传图片文件的功能，参数：{}", file);
         String result = null;
         try {
-            result = uploadFile(fileName.getBytes(), dirPath, fileName, bucketName);
+            result = uploadFile(file.getBytes(),fileName, bucketName);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -219,9 +220,10 @@ public class FileServiceImpl implements IFileService {
 
     /**
      * 解冻归档文件
+     *
      * @param bucketName 存储空间名
-     * @param fileName 文件名
-     * @param time 解冻时间（1~7）
+     * @param fileName   文件名
+     * @param time       解冻时间（1~7）
      * @return 返回结果状态码
      */
     @Override
@@ -271,21 +273,22 @@ public class FileServiceImpl implements IFileService {
 
     /**
      * 设置文件过期时间
+     *
      * @param bucketName 存储空间名称
-     * @param fileName 文件名称
-     * @param days 过期时间(天)
+     * @param fileName   文件名称
+     * @param days       过期时间(天)
      * @return 返回结果状态码
      */
     @Override
     public String setOverTime(String bucketName, String fileName, Integer days) {
-        log.debug("开始处理设置存储空间:{}的文件:{}过期时间为:{}天",bucketName,fileName,days);
+        log.debug("开始处理设置存储空间:{}的文件:{}过期时间为:{}天", bucketName, fileName, days);
         String EncodedEntryURI = bucketName + ":" + fileName;
         Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
-        String path = "/deleteAfterDays/"+BASE64Encoder.encode(EncodedEntryURI.getBytes())+"/" + days + "\n";
+        String path = "/deleteAfterDays/" + BASE64Encoder.encode(EncodedEntryURI.getBytes()) + "/" + days + "\n";
         log.debug("认证的路径为：" + path);
         String access_token = auth.sign(path);
         System.out.println(access_token);
-        String url = "http://rs.qiniuapi.com/deleteAfterDays/"+BASE64Encoder.encode(EncodedEntryURI.getBytes())+"/" + days;
+        String url = "http://rs.qiniuapi.com/deleteAfterDays/" + BASE64Encoder.encode(EncodedEntryURI.getBytes()) + "/" + days;
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .addHeader("Authorization", "QBox " + access_token).build();
@@ -416,26 +419,25 @@ public class FileServiceImpl implements IFileService {
      * 该方法是处理上传图片的核心方法---逻辑代码
      *
      * @param file       文件的二进制
-     * @param filePath   文件的路径
      * @param fileName   文件名
      * @param bucketName 空间名
      * @throws Exception 异常
      */
-    private String uploadFile(byte[] file, String filePath, String fileName, String bucketName) throws Exception {
-        File targetFile = new File(filePath);
+    private String uploadFile(byte[] file,String fileName, String bucketName) throws Exception {
+        File targetFile = new File(dirPath);
         if (!targetFile.exists()) {
             boolean mkdirs = targetFile.mkdirs();
             String message = mkdirs ? "创建文件成功" : "创建文件失败";
             System.out.println(message);
         }
-        FileOutputStream out = new FileOutputStream(filePath + "/" + fileName);// 创建文件输出流，指定需要写入的文件路径
+        FileOutputStream out = new FileOutputStream(dirPath + "/" + fileName);// 创建文件输出流，指定需要写入的文件路径
         out.write(file);
         out.flush(); // 刷新文件输出流
         out.close(); // 关闭文件输出流
         Configuration cfg = new Configuration(Zone.zone2()); // 创建配置，传入区域
         UploadManager uploadManager = new UploadManager(cfg); // 创建上传信息，传入区域
 
-        String localFilePath = filePath + "/" + fileName; // 上传图片路径
+        String localFilePath = dirPath + "/" + fileName; // 上传图片路径
 
         Auth auth = Auth.create(accessKey, secretKey);
         String upToken = auth.uploadToken(bucketName); // 上传文件时生成的凭证Token

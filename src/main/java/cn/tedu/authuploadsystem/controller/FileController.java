@@ -58,7 +58,7 @@ public class FileController {
         System.out.println("图片名称:" + file);
         String fileName = System.currentTimeMillis() + file.getOriginalFilename();
         String buckName = "jstart";
-        String result = fileService.uploadImage(fileName, buckName);
+        String result = fileService.uploadImage(file, fileName, buckName);
         return JsonResult.ok(result);
     }
 
@@ -241,46 +241,48 @@ public class FileController {
 
     /**
      * 解冻归档文件
+     *
      * @param bucketName 存储空间名
-     * @param fileName 文件名
-     * @param time 解冻有效时间(1~7)
+     * @param fileName   文件名
+     * @param time       解冻有效时间(1~7)
      * @return 返回结果状态码
      */
     @ApiOperation("解冻归档文件")
     @ApiOperationSupport(order = 408)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "bucketName",value = "存储空间名",required = true,dataType = "string"),
-            @ApiImplicitParam(name = "fileName",value = "文件名",required = true,dataType = "string"),
-            @ApiImplicitParam(name = "time",value = "解冻有效时间",required = true,dataType = "string"),
+            @ApiImplicitParam(name = "bucketName", value = "存储空间名", required = true, dataType = "string"),
+            @ApiImplicitParam(name = "fileName", value = "文件名", required = true, dataType = "string"),
+            @ApiImplicitParam(name = "time", value = "解冻有效时间", required = true, dataType = "string"),
     })
     @PostMapping("/{bucketName}/{fileName}/{time}/fileToThaw")
     public JsonResult<String> fileToThaw(@PathVariable String bucketName,
                                          @PathVariable String fileName,
-                                         @PathVariable String time){
-        log.debug("开始处理解冻存储空间:{}的文件:{},有效时间为:{}天",bucketName,fileName,time);
+                                         @PathVariable String time) {
+        log.debug("开始处理解冻存储空间:{}的文件:{},有效时间为:{}天", bucketName, fileName, time);
         String result = fileService.fileToThaw(bucketName, fileName, time);
         return JsonResult.ok(result);
     }
 
     /**
      * 设置过期时间
+     *
      * @param bucketName 存储空间
-     * @param fileName 文件名
-     * @param days 时间/天
+     * @param fileName   文件名
+     * @param days       时间/天
      * @return 返回结果状态码
      */
     @ApiOperation("设置过期时间")
     @ApiOperationSupport(order = 409)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "bucketName",value = "存储空间名",required = true,dataType = "string"),
-            @ApiImplicitParam(name = "fileName",value = "文件名",required = true,dataType = "string"),
-            @ApiImplicitParam(name = "days",value = "过期时间",required = true,dataType = "int"),
+            @ApiImplicitParam(name = "bucketName", value = "存储空间名", required = true, dataType = "string"),
+            @ApiImplicitParam(name = "fileName", value = "文件名", required = true, dataType = "string"),
+            @ApiImplicitParam(name = "days", value = "过期时间", required = true, dataType = "int"),
     })
     @PostMapping("/{bucketName}/{fileName}/{days:[0-9]+}/setOverTime")
     public JsonResult<String> setOverTime(@PathVariable String bucketName,
                                           @PathVariable String fileName,
-                                          @PathVariable Integer days){
-        log.debug("开始处理设置存储空间:{}的文件:{}过期时间为:{}天",bucketName,fileName,days);
+                                          @PathVariable Integer days) {
+        log.debug("开始处理设置存储空间:{}的文件:{}过期时间为:{}天", bucketName, fileName, days);
         String result = fileService.setOverTime(bucketName, fileName, days);
         return JsonResult.ok(result);
     }

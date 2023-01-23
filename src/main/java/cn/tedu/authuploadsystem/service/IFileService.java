@@ -2,6 +2,7 @@ package cn.tedu.authuploadsystem.service;
 
 import cn.tedu.authuploadsystem.pojo.entity.CopyToFile;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 上载的业务层接口
@@ -19,7 +20,7 @@ public interface IFileService {
      * @param bucketName 空间名称
      * @return 返回最终的图片名称
      */
-    String uploadImage(String fileName,String bucketName);
+    String uploadImage(MultipartFile file,String fileName, String bucketName);
 
     /**
      * 删除文件的功能
