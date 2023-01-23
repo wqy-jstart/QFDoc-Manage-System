@@ -238,4 +238,27 @@ public class FileController {
         String result = fileService.setBucketType3(bucketName, fileName);
         return JsonResult.ok(result);
     }
+
+    /**
+     * 解冻归档文件
+     * @param bucketName 存储空间名
+     * @param fileName 文件名
+     * @param time 解冻有效时间(1~7)
+     * @return 返回结果状态码
+     */
+    @ApiOperation("解冻归档文件")
+    @ApiOperationSupport(order = 408)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "bucketName",value = "存储空间名",required = true,dataType = "string"),
+            @ApiImplicitParam(name = "fileName",value = "文件名",required = true,dataType = "string"),
+            @ApiImplicitParam(name = "time",value = "解冻有效时间",required = true,dataType = "string"),
+    })
+    @PostMapping("/{bucketName}/{fileName}/{time}/fileToThaw")
+    public JsonResult<String> fileToThaw(@PathVariable String bucketName,
+                                         @PathVariable String fileName,
+                                         @PathVariable String time){
+        log.debug("开始处理解冻存储空间:{}的文件:{},有效时间为:{}天",bucketName,fileName,time);
+        String result = fileService.fileToThaw(bucketName, fileName, time);
+        return JsonResult.ok(result);
+    }
 }

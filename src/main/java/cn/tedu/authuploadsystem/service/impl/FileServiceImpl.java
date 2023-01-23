@@ -217,9 +217,56 @@ public class FileServiceImpl implements IFileService {
         return setBucketType(bucketName, fileName, 3);
     }
 
+    /**
+     * 解冻归档文件
+     * @param bucketName 存储空间名
+     * @param fileName 文件名
+     * @param time 解冻时间（1~7）
+     * @return 返回结果状态码
+     */
     @Override
     public String fileToThaw(String bucketName, String fileName, String time) {
-        return null;
+        log.debug("开始处理解冻存储空间：{}的文件：{}，解冻有效时间为：{}天", bucketName, fileName, time);
+        String EncodedEntryURI = bucketName + ":" + fileName;
+        Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
+        String path = "/restoreAr/" + BASE64Encoder.encode(EncodedEntryURI.getBytes()) + "/freezeAfterDays/" + time + "\n";
+        log.debug("认证的路径为：" + path);
+        String access_token = auth.sign(path);
+        System.out.println(access_token);
+        String url = "http://rs.qiniuapi.com/restoreAr/" + BASE64Encoder.encode(EncodedEntryURI.getBytes()) + "/freezeAfterDays/" + time;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("Authorization", "QBox " + access_token).build();
+        okhttp3.Response re = null;
+        try {
+            re = client.newCall(request).execute();
+            if (re.isSuccessful()) { // 判断执行结果是否成功！
+                System.out.println(re.code());
+                System.out.println(re.toString());
+            } else {
+                System.out.println("错误代码：" + re.code());
+                System.out.println(re.toString());
+                if (re.code() == 612) {
+                    String message = "设置失败，文件不存在或被删除！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                } else if (re.code() == 631) {
+                    String message = "修改失败，该空间不存在！";
+                    throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+                } else if (re.code() == 401) {
+                    String message = "认证信息有误！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                } else if (re.code() == 400) {
+                    String message = "解冻失败，该文件正在解冻或解冻时间无效！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                } else if (re.code() == 403) {
+                    String message = "解冻失败，该文件为非归档文件！";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return re.code() + "";
     }
 
     /**
