@@ -1,19 +1,20 @@
 package cn.tedu.authuploadsystem.service.impl;
 
 import cn.tedu.authuploadsystem.ex.ServiceException;
+import cn.tedu.authuploadsystem.pojo.entity.Body;
 import cn.tedu.authuploadsystem.pojo.entity.Bucket;
+import cn.tedu.authuploadsystem.pojo.entity.Tag;
 import cn.tedu.authuploadsystem.service.IBucketService;
 import cn.tedu.authuploadsystem.util.BASE64Encoder;
 import cn.tedu.authuploadsystem.web.ServiceCode;
+import com.alibaba.fastjson.JSON;
 import com.qiniu.common.Zone;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -77,15 +78,15 @@ public class BucketServiceImpl implements IBucketService {
                 } else if (re.code() == 631) {
                     String message = "创建失败，该空间名不存在！";
                     throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
-                }else if(re.code() == 400){
+                } else if (re.code() == 400) {
                     String message = "创建失败，不符合命名规范！";
-                    throw new ServiceException(ServiceCode.ERROR_CONFLICT,message);
-                }else if(re.code() == 401){
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                } else if (re.code() == 401) {
                     String message = "认证信息有误！";
-                    throw new ServiceException(ServiceCode.ERROR_CONFLICT,message);
-                }else if(re.code() == 630){
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                } else if (re.code() == 630) {
                     String message = "已创建的空间数量达到上限，无法创建新空间";
-                    throw new ServiceException(ServiceCode.ERROR_CONFLICT,message);
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
                 }
             }
         } catch (IOException e) {
@@ -172,6 +173,7 @@ public class BucketServiceImpl implements IBucketService {
 
     /**
      * 设置Bucket公开访问权限
+     *
      * @param bucketName 存储空间名
      * @return 返回结果状态码
      */
@@ -182,6 +184,7 @@ public class BucketServiceImpl implements IBucketService {
 
     /**
      * 设置Bucket私有访问权限
+     *
      * @param bucketName 存储空间名
      * @return 返回结果状态码
      */
@@ -191,9 +194,59 @@ public class BucketServiceImpl implements IBucketService {
     }
 
     /**
+     * 给指定空间设置标签
+     * @param bucketName 空间名
+     * @param key 标签名
+     * @param value 标签值
+     * @return 返回结果状态码
+     */
+    @Override
+    public String setBucketTags(String bucketName, String key, String value) {
+        log.debug("开始处理添加存储空间:{}的标签,key:{};value:{}", bucketName, key, value);
+        Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
+        String path = "/bucketTagging?bucket=" + bucketName + "\n";
+        log.debug("认证的路径为：" + path);
+        String access_token = auth.sign(path);
+        System.out.println(access_token);
+        String url = "http://uc.qiniuapi.com/bucketTagging?bucket=" + bucketName;
+        OkHttpClient client = new OkHttpClient();
+        Tag tag = new Tag(key, value);
+        System.out.println("标签对象:" + tag);
+        List<Tag> list = new ArrayList<>();
+        list.add(tag);
+        Body body = new Body();
+        body.setTags(list);
+        System.out.println(body);
+        String s = JSON.toJSONString(body);
+        System.out.println("JSON对象:" + s);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("json"), s);
+        Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", "QBox " + access_token).put(requestBody).build();
+        okhttp3.Response re = null;
+        try {
+            re = client.newCall(request).execute();
+            if (re.isSuccessful()) { // 判断执行结果是否成功！
+                System.out.println(re.code());
+                System.out.println(re.toString());
+            } else {
+                System.out.println("错误代码：" + re.code());
+                System.out.println(re.toString());
+                if (re.code() == 631) {
+                    String message = "修改失败，该空间不存在！";
+                    throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return re.code() + "";
+    }
+
+    /**
      * 处理设置存储空间访问权限的逻辑
+     *
      * @param bucketName 存储空间的名称
-     * @param authId 权限Id
+     * @param authId     权限Id
      * @return 返回结果状态码
      */
     private String setBucketAuth(String bucketName, Integer authId) {

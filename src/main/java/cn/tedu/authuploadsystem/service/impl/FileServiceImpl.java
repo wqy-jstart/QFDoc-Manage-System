@@ -57,11 +57,12 @@ public class FileServiceImpl implements IFileService {
      * @return 返回文件名
      */
     @Override
-    public String uploadImage(MultipartFile file, String fileName, String bucketName) {
+    public String uploadImage(MultipartFile file, String bucketName) {
         log.debug("开始处理上传图片文件的功能，参数：{}", file);
+        String fileName = System.currentTimeMillis() + file.getOriginalFilename();
         String result = null;
         try {
-            result = uploadFile(file.getBytes(),fileName, bucketName);
+            result = uploadFile(file.getBytes(), fileName, bucketName);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -423,7 +424,7 @@ public class FileServiceImpl implements IFileService {
      * @param bucketName 空间名
      * @throws Exception 异常
      */
-    private String uploadFile(byte[] file,String fileName, String bucketName) throws Exception {
+    private String uploadFile(byte[] file, String fileName, String bucketName) throws Exception {
         File targetFile = new File(dirPath);
         if (!targetFile.exists()) {
             boolean mkdirs = targetFile.mkdirs();

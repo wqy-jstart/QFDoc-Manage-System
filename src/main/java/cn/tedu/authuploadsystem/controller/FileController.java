@@ -56,9 +56,8 @@ public class FileController {
     @PostMapping("/image")
     public JsonResult<String> uploadImg(MultipartFile file) throws JSONException {
         System.out.println("图片名称:" + file);
-        String fileName = System.currentTimeMillis() + file.getOriginalFilename();
         String buckName = "jstart";
-        String result = fileService.uploadImage(file, fileName, buckName);
+        String result = fileService.uploadImage(file, buckName);
         return JsonResult.ok(result);
     }
 

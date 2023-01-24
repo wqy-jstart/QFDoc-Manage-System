@@ -64,15 +64,16 @@ public class BucketController {
 
     /**
      * 查询指定存储空间的列表
+     *
      * @param bucketName 空间名称
      * @return 返回查询的该空间的文件列表
      */
     @ApiOperation("查询指定存储空间的列表")
     @ApiOperationSupport(order = 300)
-    @ApiImplicitParam(name = "bucketName",value = "空间名称",required = true,dataType = "string")
+    @ApiImplicitParam(name = "bucketName", value = "空间名称", required = true, dataType = "string")
     @GetMapping("/{bucketName}/bucketList")
     public JsonResult<List<Bucket>> bucketList(@PathVariable String bucketName) {
-        log.debug("开始处理查询存储空间：{}的文件列表",bucketName);
+        log.debug("开始处理查询存储空间：{}的文件列表", bucketName);
         List<Bucket> buckets = bucketService.bucketList(bucketName);
         return JsonResult.ok(buckets);
     }
@@ -80,11 +81,11 @@ public class BucketController {
     @ApiOperation("设置空间公开权限")
     @ApiOperationSupport(order = 400)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "bucketName",value = "存储空间名",required = true,dataType = "string")
+            @ApiImplicitParam(name = "bucketName", value = "存储空间名", required = true, dataType = "string")
     })
     @PostMapping("/{bucketName}/setBucketPublic")
-    public JsonResult<String> setBucketPublic(@PathVariable String bucketName){
-        log.debug("开始处理设置存储空间：{}的访问权限为公开！",bucketName);
+    public JsonResult<String> setBucketPublic(@PathVariable String bucketName) {
+        log.debug("开始处理设置存储空间：{}的访问权限为公开！", bucketName);
         String result = bucketService.setBucketPublic(bucketName);
         return JsonResult.ok(result);
     }
@@ -92,12 +93,37 @@ public class BucketController {
     @ApiOperation("设置空间私有权限")
     @ApiOperationSupport(order = 401)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "bucketName",value = "存储空间名",required = true,dataType = "string")
+            @ApiImplicitParam(name = "bucketName", value = "存储空间名", required = true, dataType = "string")
     })
     @PostMapping("/{bucketName}/setBucketPrivate")
-    public JsonResult<String> setBucketPrivate(@PathVariable String bucketName){
-        log.debug("开始处理设置存储空间：{}的访问权限为私有！",bucketName);
+    public JsonResult<String> setBucketPrivate(@PathVariable String bucketName) {
+        log.debug("开始处理设置存储空间：{}的访问权限为私有！", bucketName);
         String result = bucketService.setBucketPrivate(bucketName);
         return JsonResult.ok(result);
+    }
+
+    /**
+     * 设置存储空间的标签
+     *
+     * @param bucketName 空间名
+     * @param key        标签名
+     * @param value      标签值
+     * @return 返回结果状态码
+     */
+    @ApiOperation("设置标签")
+    @ApiOperationSupport(order = 402)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "bucketName", value = "空间名", required = true, dataType = "string"),
+            @ApiImplicitParam(name = "key", value = "标签名", required = true, dataType = "string"),
+            @ApiImplicitParam(name = "value", value = "标签值", required = true, dataType = "string"),
+
+    })
+    @PostMapping("/{bucketName}/{key}/{value}/setBucketTags")
+    public JsonResult<String> setBucketTags(@PathVariable String bucketName,
+                                            @PathVariable String key,
+                                            @PathVariable String value) {
+        log.debug("开始处理添加存储空间:{}的标签的请求,key:{};value:{}", bucketName, key, value);
+        String s = bucketService.setBucketTags(bucketName, key, value);
+        return JsonResult.ok(s);
     }
 }

@@ -49,4 +49,13 @@ public interface IBucketService {
      * @return 返回状态码
      */
     String setBucketPrivate(String bucketName);
+
+    /**
+     * 设置空间标签
+     * @param bucketName 空间名
+     * @param key 标签名
+     * @param value 标签值
+     * @return 返回结果状态码
+     */
+    String setBucketTags(String bucketName,String key,String value);
 }
