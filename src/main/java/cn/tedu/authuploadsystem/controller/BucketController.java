@@ -1,6 +1,7 @@
 package cn.tedu.authuploadsystem.controller;
 
 import cn.tedu.authuploadsystem.pojo.entity.Bucket;
+import cn.tedu.authuploadsystem.pojo.entity.Tag;
 import cn.tedu.authuploadsystem.service.IBucketService;
 import cn.tedu.authuploadsystem.web.JsonResult;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
@@ -125,5 +126,20 @@ public class BucketController {
         log.debug("开始处理添加存储空间:{}的标签的请求,key:{};value:{}", bucketName, key, value);
         String s = bucketService.setBucketTags(bucketName, key, value);
         return JsonResult.ok(s);
+    }
+
+    /**
+     * 查询指定存储空间的标签数据
+     * @param bucketName 空间名
+     * @return 返回List集合
+     */
+    @ApiOperation("查询指定存储空间的标签数据")
+    @ApiOperationSupport(order = 403)
+    @ApiImplicitParam(name = "bucketName",value = "空间名称",required = true,dataType = "string")
+    @GetMapping("/{bucketName}/selectToTags")
+    public JsonResult<List<Tag>> selectToTags(@PathVariable String bucketName){
+        log.debug("开始处理查询存储空间:{}的标签数据",bucketName);
+        List<Tag> list = bucketService.selectToTags(bucketName);
+        return JsonResult.ok(list);
     }
 }

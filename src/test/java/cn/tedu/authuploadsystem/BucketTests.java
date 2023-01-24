@@ -6,6 +6,9 @@ import cn.tedu.authuploadsystem.pojo.entity.Tag;
 import cn.tedu.authuploadsystem.util.BASE64Encoder;
 import cn.tedu.authuploadsystem.web.ServiceCode;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.xiaoymin.knife4j.core.util.StrUtil;
 import com.qiniu.common.Zone;
 import com.qiniu.storage.BucketManager;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -257,7 +261,7 @@ public class BucketTests {
     }
 
     /**
-     * 解冻归档文件
+     * 解冻归档文件(已完成!)
      */
     @Test
     public void fileToThaw() {
@@ -305,6 +309,9 @@ public class BucketTests {
         }
     }
 
+    /**
+     * 设置标签(已完成!)
+     */
     @Test
     public void setTags() {
         String buckName = "jstart";
@@ -315,8 +322,8 @@ public class BucketTests {
         System.out.println(access_token);
         String url = "http://uc.qiniuapi.com/bucketTagging?bucket=" + buckName;
         OkHttpClient client = new OkHttpClient();
-        Tag tag = new Tag("test2","02");
-        System.out.println("标签对象:"+tag);
+        Tag tag = new Tag("test2", "02");
+        System.out.println("标签对象:" + tag);
         List<Tag> list = new ArrayList<>();
         list.add(tag);
         Body body = new Body();
@@ -331,7 +338,7 @@ public class BucketTests {
 //                "\t\t}\n" +
 //                "\t]\n" +
 //                "}";
-        System.out.println("JSON对象:"+s);
+        System.out.println("JSON对象:" + s);
         RequestBody requestBody = RequestBody.create(MediaType.parse("json"), s);
         Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/json")
                 .addHeader("Authorization", "QBox " + access_token).put(requestBody).build();
@@ -341,6 +348,51 @@ public class BucketTests {
             if (re.isSuccessful()) { // 判断执行结果是否成功！
                 System.out.println(re.code());
                 System.out.println(re.toString());
+            } else {
+                System.out.println("错误代码：" + re.code());
+                System.out.println(re.toString());
+                if (re.code() == 631) {
+                    String message = "修改失败，该空间不存在！";
+                    throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 查询标签(已完成!)
+     */
+    @Test
+    public void tagsList() {
+        String buckName = "jstart";
+        Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
+        String path = "/bucketTagging?bucket=" + buckName + "\n";
+        log.debug("认证的路径为：" + path);
+        String access_token = auth.sign(path);
+        System.out.println(access_token);
+        String url = "http://uc.qiniuapi.com/bucketTagging?bucket=" + buckName;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", "QBox " + access_token).build();
+        okhttp3.Response re = null;
+        try {
+            re = client.newCall(request).execute();
+            if (re.isSuccessful()) { // 判断执行结果是否成功！
+                System.out.println(re.code());
+                System.out.println(re.toString());
+                ResponseBody body = re.body(); // 获取body中的json数据
+                if (body == null){
+                    String message = "响应数据为空,请检查操作是否有误!";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT,message);
+                }
+                String str = body.string();
+                int start = str.indexOf(":")+1;
+                int end = str.lastIndexOf("}");
+                String result = str.substring(start, end);
+                List<Tag> list = JSONObject.parseArray(result, Tag.class);// 将json转为List<Tag>集合
+                System.out.println(list);
             } else {
                 System.out.println("错误代码：" + re.code());
                 System.out.println(re.toString());

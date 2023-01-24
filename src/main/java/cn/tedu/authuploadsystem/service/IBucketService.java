@@ -1,6 +1,7 @@
 package cn.tedu.authuploadsystem.service;
 
 import cn.tedu.authuploadsystem.pojo.entity.Bucket;
+import cn.tedu.authuploadsystem.pojo.entity.Tag;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -58,4 +59,11 @@ public interface IBucketService {
      * @return 返回结果状态码
      */
     String setBucketTags(String bucketName,String key,String value);
+
+    /**
+     * 查询指定存储空间的标签
+     * @param buckName 存储空间名
+     * @return 返回标签数据
+     */
+    List<Tag> selectToTags(String buckName);
 }

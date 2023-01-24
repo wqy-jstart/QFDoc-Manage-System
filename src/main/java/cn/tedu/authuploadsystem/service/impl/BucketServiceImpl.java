@@ -8,6 +8,7 @@ import cn.tedu.authuploadsystem.service.IBucketService;
 import cn.tedu.authuploadsystem.util.BASE64Encoder;
 import cn.tedu.authuploadsystem.web.ServiceCode;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.qiniu.common.Zone;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
@@ -195,9 +196,10 @@ public class BucketServiceImpl implements IBucketService {
 
     /**
      * 给指定空间设置标签
+     *
      * @param bucketName 空间名
-     * @param key 标签名
-     * @param value 标签值
+     * @param key        标签名
+     * @param value      标签值
      * @return 返回结果状态码
      */
     @Override
@@ -240,6 +242,54 @@ public class BucketServiceImpl implements IBucketService {
             e.printStackTrace();
         }
         return re.code() + "";
+    }
+
+    /**
+     * 查询指定存储空间的标签数据
+     * @param buckName 存储空间名
+     * @return 返回List集合
+     */
+    @Override
+    public List<Tag> selectToTags(String buckName) {
+        log.debug("开始处理查询存储空间:{}的标签数据", buckName);
+        Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
+        String path = "/bucketTagging?bucket=" + buckName + "\n";
+        log.debug("认证的路径为：" + path);
+        String access_token = auth.sign(path);
+        System.out.println(access_token);
+        String url = "http://uc.qiniuapi.com/bucketTagging?bucket=" + buckName;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", "QBox " + access_token).build();
+        okhttp3.Response re = null;
+        List<Tag> resultList = null;
+        try {
+            re = client.newCall(request).execute();
+            if (re.isSuccessful()) { // 判断执行结果是否成功！
+                System.out.println(re.code());
+                System.out.println(re.toString());
+                ResponseBody body = re.body(); // 获取body中的json数据
+                if (body == null) {
+                    String message = "响应数据为空,请检查操作是否有误!";
+                    throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+                }
+                String str = body.string();
+                int start = str.indexOf(":") + 1;
+                int end = str.lastIndexOf("}");
+                String result = str.substring(start, end);
+                resultList = JSONObject.parseArray(result, Tag.class);// 将json转为List<Tag>集合
+            } else {
+                System.out.println("错误代码：" + re.code());
+                System.out.println(re.toString());
+                if (re.code() == 631) {
+                    String message = "修改失败，该空间不存在！";
+                    throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return resultList;
     }
 
     /**
