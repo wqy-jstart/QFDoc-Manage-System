@@ -130,16 +130,33 @@ public class BucketController {
 
     /**
      * 查询指定存储空间的标签数据
+     *
      * @param bucketName 空间名
      * @return 返回List集合
      */
     @ApiOperation("查询指定存储空间的标签数据")
     @ApiOperationSupport(order = 403)
-    @ApiImplicitParam(name = "bucketName",value = "空间名称",required = true,dataType = "string")
+    @ApiImplicitParam(name = "bucketName", value = "空间名称", required = true, dataType = "string")
     @GetMapping("/{bucketName}/selectToTags")
-    public JsonResult<List<Tag>> selectToTags(@PathVariable String bucketName){
-        log.debug("开始处理查询存储空间:{}的标签数据",bucketName);
+    public JsonResult<List<Tag>> selectToTags(@PathVariable String bucketName) {
+        log.debug("开始处理查询存储空间:{}的标签数据", bucketName);
         List<Tag> list = bucketService.selectToTags(bucketName);
         return JsonResult.ok(list);
+    }
+
+    /**
+     * 删除空间标签
+     *
+     * @param bucketName 空间名
+     * @return 返回结果状态码
+     */
+    @ApiOperation("删除空间标签")
+    @ApiOperationSupport(order = 404)
+    @ApiImplicitParam(name = "bucketName", value = "空间名称", required = true, dataType = "string")
+    @DeleteMapping("/{bucketName}/deleteToTags")
+    public JsonResult<String> deleteToTags(@PathVariable String bucketName) {
+        log.debug("开始处理删除存储空间:{}的标签信息的请求", bucketName);
+        String result = bucketService.deleteToTags(bucketName);
+        return JsonResult.ok(result);
     }
 }

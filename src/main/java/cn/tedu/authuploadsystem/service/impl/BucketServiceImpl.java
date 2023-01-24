@@ -246,6 +246,7 @@ public class BucketServiceImpl implements IBucketService {
 
     /**
      * 查询指定存储空间的标签数据
+     *
      * @param buckName 存储空间名
      * @return 返回List集合
      */
@@ -290,6 +291,43 @@ public class BucketServiceImpl implements IBucketService {
             e.printStackTrace();
         }
         return resultList;
+    }
+
+    /**
+     * 开始处理删除空间标签的功能
+     * @param bucketName 空间名
+     * @return 返回结果状态码
+     */
+    @Override
+    public String deleteToTags(String bucketName) {
+        log.debug("开始处理删除空间:{}的标签", bucketName);
+        Auth auth = Auth.create(accessKey, secretKey);// 将AK和SK传入进行认证
+        String path = "/bucketTagging?bucket=" + bucketName + "\n";
+        log.debug("认证的路径为：" + path);
+        String access_token = auth.sign(path);
+        System.out.println(access_token);
+        String url = "http://uc.qiniuapi.com/bucketTagging?bucket=" + bucketName;
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", "QBox " + access_token).delete().build();
+        okhttp3.Response re = null;
+        try {
+            re = client.newCall(request).execute();
+            if (re.isSuccessful()) { // 判断执行结果是否成功！
+                System.out.println(re.code());
+                System.out.println(re.toString());
+            } else {
+                System.out.println("错误代码：" + re.code());
+                System.out.println(re.toString());
+                if (re.code() == 631) {
+                    String message = "修改失败，该空间不存在！";
+                    throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return re.code() + "";
     }
 
     /**

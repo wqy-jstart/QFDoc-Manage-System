@@ -66,4 +66,11 @@ public interface IBucketService {
      * @return 返回标签数据
      */
     List<Tag> selectToTags(String buckName);
+
+    /**
+     * 删除空间标签
+     * @param bucketName 空间名
+     * @return 返回结果状态码
+     */
+    String deleteToTags(String bucketName);
 }
