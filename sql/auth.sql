@@ -16,6 +16,7 @@ create table a_user
     phone        varchar(50)          DEFAULT NULL COMMENT '手机号码',
     email        varchar(50)          DEFAULT NULL COMMENT '电子邮箱',
     sign         varchar(255)         DEFAULT NULL COMMENT '个性签名',
+    enable       tinyint(32) unsigned DEFAULT NULL COMMENT '是否启用(1.启用 0.禁用)',
     gmt_create   datetime             DEFAULT NULL COMMENT '数据创建时间',
     gmt_modified datetime             DEFAULT NULL COMMENT '数据最后修改时间',
     PRIMARY KEY (id)
@@ -23,24 +24,24 @@ create table a_user
 INSERT INTO a_user
 VALUES (1, 'super_admin', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj15C', '男', 20, '超级管理员',
         'https://img2.baidu.com/it/u=4244269751,4000533845&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500', '13900139001',
-        'root@baidu.com', '最高权限的管理员', '2022-07-08 11:30:44', '2022-07-08 11:30:44'),
+        'root@baidu.com', '最高权限的管理员', 1, '2022-07-08 11:30:44', '2022-07-08 11:30:44'),
        (2, 'data_admin', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj15C', '男', 20, '数据管理员',
         'https://img0.baidu.com/it/u=1600969112,4145041554&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500', '13900139002',
-        'super_admin@baidu.cn', '超级管理员，通常具有除了【管理管理员】以外的全部权限', '2022-07-08 11:30:44',
+        'super_admin@baidu.cn', '超级管理员，通常具有除了【管理管理员】以外的全部权限', 1, '2022-07-08 11:30:44',
         '2022-07-08 11:30:44'),
        (3, 'update_admin', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj15C', '男', 20, '苍松老师',
         'https://img1.baidu.com/it/u=873106765,2587410047&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1663606800&t=c8de61604dbff6118ae140268f4e3c67',
-        '13900139003', 'liucangsong@baidu.cn', '刘苍松老师的账号', '2022-07-08 11:30:44',
+        '13900139003', 'liucangsong@baidu.cn', '刘苍松老师的账号', 1, '2022-07-08 11:30:44',
         '2022-07-08 11:30:44'),
        (4, 'insert_admin', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj15C', '男', 20, '克晶老师',
         'https://img2.baidu.com/it/u=3062813899,1142128231&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1663606800&t=e153f24b4499fce32df24cb1ea1b9efa',
-        '13900139004', 'wangkejing@qq.com', '王克晶老师的账号', '2022-07-08 11:30:44', '2022-07-08 11:30:44'),
+        '13900139004', 'wangkejing@qq.com', '王克晶老师的账号', 1, '2022-07-08 11:30:44', '2022-07-08 11:30:44'),
        (5, 'delete_admin', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj15C', '男', 20, '传奇老师',
         'https://img2.baidu.com/it/u=2704182461,2749837878&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500', '13900139005',
-        'fanchuanqi@baidu.com', '范传奇老师的账号', '2022-07-08 11:30:44', '2022-07-08 11:30:44'),
+        'fanchuanqi@baidu.com', '范传奇老师的账号', 1, '2022-07-08 11:30:44', '2022-07-08 11:30:44'),
        (6, 'user', '$2a$10$N.ZOn9G6/YLFixAOPMg/h.z7pCu6v2XyFDtC4q.jeeGm/TEZyj15C', '男', 20, '传奇老师',
         'https://img2.baidu.com/it/u=4244269751,4000533845&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500', '13900139005',
-        'fanchuanqi@baidu.com', '范传奇老师的账号', '2022-07-08 11:30:44', '2022-07-08 11:30:44');
+        'fanchuanqi@baidu.com', '范传奇老师的账号', 1, '2022-07-08 11:30:44', '2022-07-08 11:30:44');
 
 DROP TABLE IF EXISTS a_user_role;
 CREATE TABLE a_user_role

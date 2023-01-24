@@ -79,6 +79,12 @@ public class User implements Serializable {
     private String sign;
 
     /**
+     * 是否启用
+     */
+    @ApiModelProperty(value = "是否启用(1.启用 0.禁用)")
+    private Integer enable;
+
+    /**
      * 数据创建时间
      */
     @TableField(fill = FieldFill.INSERT)

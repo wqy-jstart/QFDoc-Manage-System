@@ -49,6 +49,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         }
 
         // 添加权限信息
+        // TODO 添加权限
         List<GrantedAuthority> authorities = new ArrayList<>();
         GrantedAuthority authority = new SimpleGrantedAuthority("这是一条假的权限信息");
         authorities.add(authority);
@@ -58,6 +59,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
                 admin.getId(),
                 admin.getUsername(),
                 admin.getPassword(),
+                admin.getEnable()==1,
                 authorities
         );
 

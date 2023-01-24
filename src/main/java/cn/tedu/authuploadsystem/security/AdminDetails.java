@@ -28,8 +28,9 @@ public class AdminDetails extends User {
     public AdminDetails(Long id,
                         String username,// 用户名
                         String password,// 密码
+                        boolean enabled,
                         Collection<? extends GrantedAuthority> authorities) { // 权限
-        super(username, password, true, true,
+        super(username, password, enabled, true,
                 true, true, authorities);
         this.id = id;
     }
