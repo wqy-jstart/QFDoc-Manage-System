@@ -42,5 +42,7 @@ auth:
 logging:
   level:
     cn.tedu.authuploadsystem: trace
+
+# 自定义资源路径
 image:
   dirPath: D:\Auth

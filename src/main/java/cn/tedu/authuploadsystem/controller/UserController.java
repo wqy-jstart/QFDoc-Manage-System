@@ -1,5 +1,6 @@
 package cn.tedu.authuploadsystem.controller;
 
+import cn.tedu.authuploadsystem.pojo.dto.UserAddNewDTO;
 import cn.tedu.authuploadsystem.pojo.dto.UserLoginDTO;
 import cn.tedu.authuploadsystem.pojo.dto.UserUpdateDTO;
 import cn.tedu.authuploadsystem.pojo.entity.User;
@@ -52,6 +53,21 @@ public class UserController {
     public JsonResult<Void> insert(@Valid User user) {
         log.debug("开始处理用户注册的功能！参数：{}", user);
         userService.insert(user);
+        return JsonResult.ok();
+    }
+
+    /**
+     * 后台添加用户
+     *
+     * @param userAddNewDTO 添加的用户信息
+     * @return 返回结果集
+     */
+    @ApiOperation("后天添加用户")
+    @ApiOperationSupport(order = 101)
+    @PostMapping("/insertToAdmin")
+    public JsonResult<Void> insert(UserAddNewDTO userAddNewDTO) {
+        log.debug("开始处理添加用户的功能，参数：{}", userAddNewDTO);
+        userService.insert(userAddNewDTO);
         return JsonResult.ok();
     }
 

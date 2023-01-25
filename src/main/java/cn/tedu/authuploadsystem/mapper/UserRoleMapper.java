@@ -13,4 +13,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface UserRoleMapper extends BaseMapper<UserRole> {
+
+    /**
+     * 根据用户批量插入用户角色关联表
+     * @param userRoles 批量查询关联表信息需要的数组
+     */
+    int insertBatch(UserRole[] userRoles);
 }

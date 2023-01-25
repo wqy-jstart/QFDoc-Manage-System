@@ -1,5 +1,6 @@
 package cn.tedu.authuploadsystem.service;
 
+import cn.tedu.authuploadsystem.pojo.dto.UserAddNewDTO;
 import cn.tedu.authuploadsystem.pojo.dto.UserLoginDTO;
 import cn.tedu.authuploadsystem.pojo.dto.UserUpdateDTO;
 import cn.tedu.authuploadsystem.pojo.entity.User;
@@ -18,8 +19,11 @@ import java.util.List;
 @Transactional
 public interface IUserService extends IService<User> {
 
-    // 添加用户的功能
+    // 用户登录的功能
     void insert(User user);
+
+    // 添加用户的功能
+    void insert(UserAddNewDTO userAddNewDTO);
 
     String login(UserLoginDTO userLoginDTO);
 

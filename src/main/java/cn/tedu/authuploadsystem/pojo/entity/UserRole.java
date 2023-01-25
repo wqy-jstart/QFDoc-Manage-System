@@ -49,5 +49,5 @@ public class UserRole implements Serializable {
      * 数据最后修改时间
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime gmtModified;
+    private Date gmtModified;
 }
