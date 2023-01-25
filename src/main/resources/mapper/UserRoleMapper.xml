@@ -3,7 +3,7 @@
 
 <mapper namespace="cn.tedu.authuploadsystem.mapper.UserRoleMapper">
 
-    <!--void insertBatch(Long[] ids);-->
+    <!--void insertBatch(UserRole[] userRoles);-->
     <insert id="insertBatch" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO a_user_role(
         admin_id,role_id,gmt_create,gmt_modified
@@ -12,5 +12,15 @@
             (#{adminRole.adminId},#{adminRole.roleId},#{adminRole.gmtCreate},#{adminRole.gmtModified})
         </foreach>
     </insert>
+
+    <!--int deleteBatch(UserRole[] userRoles);-->
+    <delete id="deleteBatch">
+        delete from a_user_role where admin_id = #{userId} and role_id in
+        (
+        <foreach collection="userRoles" item="adminRole" separator=",">
+            #{adminRole.roleId}
+        </foreach>
+            )
+    </delete>
 
 </mapper>

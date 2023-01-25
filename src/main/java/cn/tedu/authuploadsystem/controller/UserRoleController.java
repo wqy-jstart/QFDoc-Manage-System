@@ -44,7 +44,7 @@ public class UserRoleController {
      */
     @ApiOperation("分配用户角色信息")
     @ApiOperationSupport(order = 100)
-    @PostMapping("/insertBatch")
+    @PostMapping("/assignToRole")
     public JsonResult<Void> insertBatch(AssignToRole assignToRole){
         log.debug("开始处理分配角色批量查询用户角色表信息,参数：{}",assignToRole);
         userRoleService.insertBatch(assignToRole);

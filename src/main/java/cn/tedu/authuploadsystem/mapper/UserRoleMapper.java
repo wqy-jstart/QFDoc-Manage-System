@@ -19,4 +19,11 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
      * @param userRoles 批量查询关联表信息需要的数组
      */
     int insertBatch(UserRole[] userRoles);
+
+    /**
+     * 批量删除分配前的角色id
+     * @param userRoles 用户角色信息
+     * @return 返回删除的个数
+     */
+    int deleteBatch(Long userId,UserRole[] userRoles);
 }

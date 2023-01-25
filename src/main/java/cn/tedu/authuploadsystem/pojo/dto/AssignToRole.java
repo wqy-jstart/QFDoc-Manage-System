@@ -11,4 +11,5 @@ import java.io.Serializable;
 public class AssignToRole implements Serializable {
     private String username;
     private Long[] roleIds;
+    private Long[] oldRoleIds;
 }
