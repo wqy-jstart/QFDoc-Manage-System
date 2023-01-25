@@ -16,5 +16,10 @@ import java.util.List;
 @Repository
 public interface RoleMapper extends BaseMapper<Role> {
 
-
+    /**
+     * 根据用户id查询角色名称列表
+     * @param userId 角色Id
+     * @return 返回角色名称列表
+     */
+    List<Long> selectToUserId(Long userId);
 }

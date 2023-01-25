@@ -1,8 +1,12 @@
 package cn.tedu.authuploadsystem.service.impl;
 
+import cn.tedu.authuploadsystem.ex.ServiceException;
 import cn.tedu.authuploadsystem.mapper.RoleMapper;
+import cn.tedu.authuploadsystem.mapper.UserMapper;
 import cn.tedu.authuploadsystem.pojo.entity.Role;
+import cn.tedu.authuploadsystem.pojo.entity.User;
 import cn.tedu.authuploadsystem.service.IRoleService;
+import cn.tedu.authuploadsystem.web.ServiceCode;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +30,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     @Autowired
     private RoleMapper roleMapper;
 
+    // 注入用户持久层接口
+    @Autowired
+    private UserMapper userMapper;
+
     public RoleServiceImpl(){
         log.debug("创建业务层实现类：RoleServiceImpl");
     }
@@ -38,5 +46,23 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     public List<Role> selectList() {
         log.debug("开始处理查询角色列表的功能！无参");
         return roleMapper.selectList(null);
+    }
+
+    /**
+     * 根据用户id查询角色的名称列表
+     * @param userId 用户id
+     * @return 返回角色列表
+     */
+    @Override
+    public List<Long> selectToUserId(Long userId) {
+        log.debug("开始处理根据用户id查询角色名称列表，参数:{}",userId);
+        User queryUser = userMapper.selectById(userId);
+        if (queryUser == null){
+            String message = "查询失败，该用户不存在！";
+            log.debug(message);
+            throw new ServiceException(ServiceCode.ERR_NOT_FOUND,message);
+        }
+
+        return roleMapper.selectToUserId(userId);
     }
 }

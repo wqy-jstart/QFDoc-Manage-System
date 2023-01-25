@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.tedu.authuploadsystem.mapper.RoleMapper">
+
+    <!--List<Long> selectToUserId(Long userId);-->
+    <select id="selectToUserId" resultType="int">
+        select a_user_role.role_id
+        from a_user
+                 join a_user_role
+                      on a_user.id = a_user_role.admin_id
+        where a_user.id = #{userId};
+    </select>
+</mapper>

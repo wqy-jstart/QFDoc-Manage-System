@@ -87,6 +87,11 @@ public class UserController {
         return JsonResult.ok(login);
     }
 
+    /**
+     * 根据id删除用户信息
+     * @param id 用户id
+     * @return 返回结果集
+     */
     @ApiOperation("根据id删除用户信息")
     @ApiOperationSupport(order = 300)
     @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "long")

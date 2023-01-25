@@ -3,13 +3,15 @@ package cn.tedu.authuploadsystem.controller;
 import cn.tedu.authuploadsystem.pojo.entity.Role;
 import cn.tedu.authuploadsystem.service.IRoleService;
 import cn.tedu.authuploadsystem.web.JsonResult;
+import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -40,10 +42,29 @@ public class RoleController {
      *
      * @return 返回列表
      */
+    @ApiOperation("查询角色列表")
+    @ApiOperationSupport(order = 500)
     @GetMapping("")
     public JsonResult<List<Role>> selectList() {
         log.debug("开始处理查询角色列表的请求，无参！");
         List<Role> roles = roleService.selectList();
         return JsonResult.ok(roles);
+    }
+
+    /**
+     * 根据用户Id查询角色名称列表
+     *
+     * @param userId 用户id
+     * @return 返回结果集
+     */
+    @ApiOperation("根据用户Id查询角色ID列表")
+    @ApiOperationSupport(order = 501)
+    @ApiImplicitParam(name = "userId", value = "用户Id", required = true, dataType = "long")
+    @PostMapping("/{userId:[0-9]+}/selectToUserId")
+    public JsonResult<List<Long>> selectToUserId(@Range(min = 1, message = "查询失败，参数无效！")
+                                                   @PathVariable Long userId) {
+        log.debug("开始处理查询用户Id：{}的角色名称列表功能", userId);
+        List<Long> strings = roleService.selectToUserId(userId);
+        return JsonResult.ok(strings);
     }
 }
