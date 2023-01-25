@@ -89,6 +89,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
     }
 
+    /**
+     * 后台添加用户的功能
+     *
+     * @param userAddNewDTO 添加的用户数据
+     */
     @Override
     public void insert(UserAddNewDTO userAddNewDTO) {
         log.debug("开始处理后台添加用户的功能，参数：{}", userAddNewDTO);
@@ -259,5 +264,70 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public List<User> selectList() {
         log.debug("开始处理查询用户列表的功能，无参！");
         return userMapper.selectList(null);
+    }
+
+    /**
+     * 处理启用管理员的业务
+     * 通过调用启用或禁用的方法,传入id和值,
+     * (1).判断管理员id是否为1
+     * (2).该id下是否有数据
+     * (3).enable的值是否不同最终进行设置
+     * (4).最终改变的数据是否正确
+     *
+     * @param id 启用的管理员id
+     */
+    @Override
+    public void setEnable(Long id) {
+        updateEnableById(id, 1);// 调用该方法传入id,设置为启用状态
+    }
+
+    /**
+     * 处理禁用管理员的业务
+     *
+     * @param id 禁用的管理员id
+     */
+    @Override
+    public void setDisable(Long id) {
+        updateEnableById(id, 0);// 调用该方法传入id,设置为禁用状态
+    }
+
+    /**
+     * 该方法用来处理启用与禁用的逻辑
+     *
+     * @param id     id
+     * @param enable 是否启用或禁用
+     */
+    private void updateEnableById(Long id, Integer enable) {
+        String[] tips = {"禁用", "启用"};
+        log.debug("开始处理【{}管理员】的业务，id参数：{}", tips[enable], id);
+        // 判断id是否为1(系统管理员)
+        if (id == 1) {
+            String message = tips[enable] + "管理员失败，尝试访问的数据不存在！";
+            log.debug(message);
+            throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+        }
+        // 根据id查询管理员详情
+        User queryUser = userMapper.selectById(id);
+        if (queryUser == null) {
+            String message = tips[enable] + "管理员失败,尝试访问的数据不存在！";
+            log.debug(message);
+            throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+        }
+        // 判断查询结果中的enable与方法参数enable是否相同
+        if (enable.equals(queryUser.getEnable())) {
+            String message = tips[enable] + "管理员失败，管理员账号已经处于" + tips[enable] + "状态！";
+            log.debug(message);
+            throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+        }
+        // 创建admin对象,并封装id和enable这2个属性的值,并进行修改
+        User user = new User();
+        user.setId(id);
+        user.setEnable(enable);
+        int rows = userMapper.updateById(user);
+        if (rows != 1) {
+            String message = tips[enable] + "管理员失败，服务器忙，请稍后再次尝试！";
+            throw new ServiceException(ServiceCode.ERR_UPDATE, message);
+        }
+        log.debug("修改成功!");
     }
 }

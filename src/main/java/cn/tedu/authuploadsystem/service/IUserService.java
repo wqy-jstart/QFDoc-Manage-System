@@ -25,6 +25,7 @@ public interface IUserService extends IService<User> {
     // 添加用户的功能
     void insert(UserAddNewDTO userAddNewDTO);
 
+    // 用户登录的功能
     String login(UserLoginDTO userLoginDTO);
 
     // 删除用户的功能
@@ -38,5 +39,17 @@ public interface IUserService extends IService<User> {
 
     // 查询用户列表
     List<User> selectList();
+
+    /**
+     * 启用用户
+     * @param id 启用的用户id
+     */
+    void setEnable(Long id);
+
+    /**
+     * 禁用用户
+     * @param id 禁用的用户id
+     */
+    void setDisable(Long id);
 
 }

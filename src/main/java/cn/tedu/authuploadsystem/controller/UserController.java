@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -141,5 +142,39 @@ public class UserController {
         log.debug("开始处理查询用户列表的功能,无参!");
         List<User> users = userService.selectList();
         return JsonResult.ok(users);
+    }
+
+    /**
+     * 处理启用管理员的业务
+     *
+     * @param id 要启用的管理员id
+     * @return 返回JsonResult
+     */
+    @ApiOperation("启用管理员")
+    @ApiOperationSupport(order = 310)
+    @ApiImplicitParam(name = "id", value = "启用的管理员id", required = true, dataType = "long")
+    @PostMapping("/{id:[0-9]+}/enable")
+    public JsonResult<Void> setEnable(@Range(min = 1, message = "启用管理员失败,尝试启用的id无效!")
+                                      @PathVariable Long id) {
+        log.debug("开始将id为{}的管理员设置为启用状态", id);
+        userService.setEnable(id);
+        return JsonResult.ok();
+    }
+
+    /**
+     * 处理禁用管理员的业务
+     *
+     * @param id 要禁用的管理员id
+     * @return 返回JsonResult
+     */
+    @ApiOperation("禁用管理员")
+    @ApiOperationSupport(order = 311)
+    @ApiImplicitParam(name = "id", value = "禁用的管理员id", required = true, dataType = "long")
+    @PostMapping("/{id:[0-9]+}/disable")
+    public JsonResult<Void> setDisable(@Range(min = 1, message = "禁用管理员失败,尝试启用的id无效!")
+                                       @PathVariable Long id) {
+        log.debug("开始将id为{}的管理员设置为禁用状态", id);
+        userService.setDisable(id);
+        return JsonResult.ok();
     }
 }
