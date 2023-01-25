@@ -28,4 +28,10 @@ public interface IRoleService extends IService<Role>{
      * @return 返回角色列表
      */
     List<Long> selectToUserId(Long userId);
+
+    /**
+     * 查询所有角色Id
+     * @return 返回Id列表
+     */
+    List<Long> selectRoleId();
 }

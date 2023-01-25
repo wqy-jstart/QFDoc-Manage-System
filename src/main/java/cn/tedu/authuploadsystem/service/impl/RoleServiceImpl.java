@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PutMapping;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -64,5 +65,20 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
         }
 
         return roleMapper.selectToUserId(userId);
+    }
+
+    /**
+     * 查询所有角色Id
+     * @return 返回列表
+     */
+    @Override
+    public List<Long> selectRoleId() {
+        log.debug("开始处理查询所有角色Id的功能，无参！");
+        List<Role> roles = roleMapper.selectList(null);
+        List<Long> roleIds = new ArrayList<>();
+        for (Role role : roles) {
+            roleIds.add(role.getId());
+        }
+        return roleIds;
     }
 }

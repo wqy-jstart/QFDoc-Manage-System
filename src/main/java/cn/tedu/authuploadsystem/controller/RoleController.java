@@ -67,4 +67,17 @@ public class RoleController {
         List<Long> strings = roleService.selectToUserId(userId);
         return JsonResult.ok(strings);
     }
+
+    /**
+     * 查询所有角色Id
+     * @return 返回列表
+     */
+    @ApiOperation("查询所有角色Id")
+    @ApiOperationSupport(order = 502)
+    @GetMapping("/selectRoleIds")
+    public JsonResult<List<Long>> selectRoleIds(){
+        log.debug("开始处理查询所有角色Id的功能");
+        List<Long> longs = roleService.selectRoleId();
+        return JsonResult.ok(longs);
+    }
 }
