@@ -1,5 +1,6 @@
 package cn.tedu.authuploadsystem.controller;
 
+import cn.tedu.authuploadsystem.pojo.dto.RoleUpdateDTO;
 import cn.tedu.authuploadsystem.pojo.entity.Role;
 import cn.tedu.authuploadsystem.service.IRoleService;
 import cn.tedu.authuploadsystem.web.JsonResult;
@@ -38,6 +39,21 @@ public class RoleController {
     }
 
     /**
+     * 执行修改角色的请求
+     *
+     * @param roleUpdateDTO 修改角色的信息
+     * @return 返回结果集
+     */
+    @ApiOperation("根据id修改角色")
+    @ApiOperationSupport(order = 100)
+    @PostMapping("/update")
+    public JsonResult<Void> update(RoleUpdateDTO roleUpdateDTO) {
+        log.debug("开始处理修改角色的业务,无参！");
+        roleService.update(roleUpdateDTO);
+        return JsonResult.ok();
+    }
+
+    /**
      * 处理查询角色列表的请求
      *
      * @return 返回列表
@@ -53,15 +69,16 @@ public class RoleController {
 
     /**
      * 根据id查询角色详情
+     *
      * @param roleId 角色id
      * @return 返回角色详情
      */
     @ApiOperation("根据id查询角色详情")
     @ApiOperationSupport(order = 500)
-    @ApiImplicitParam(name = "roleId",value = "角色Id",required = true,dataType = "long")
+    @ApiImplicitParam(name = "roleId", value = "角色Id", required = true, dataType = "long")
     @PostMapping("/{roleId:[0-9]+}/selectById")
-    public JsonResult<Role> selectById(@PathVariable Long roleId){
-        log.debug("开始处理查询id为：{}的角色详情",roleId);
+    public JsonResult<Role> selectById(@PathVariable Long roleId) {
+        log.debug("开始处理查询id为：{}的角色详情", roleId);
         Role role = roleService.selectById(roleId);
         return JsonResult.ok(role);
     }
@@ -77,7 +94,7 @@ public class RoleController {
     @ApiImplicitParam(name = "userId", value = "用户Id", required = true, dataType = "long")
     @PostMapping("/{userId:[0-9]+}/selectToUserId")
     public JsonResult<List<Long>> selectToUserId(@Range(min = 1, message = "查询失败，参数无效！")
-                                                   @PathVariable Long userId) {
+                                                 @PathVariable Long userId) {
         log.debug("开始处理查询用户Id：{}的角色名称列表功能", userId);
         List<Long> strings = roleService.selectToUserId(userId);
         return JsonResult.ok(strings);
@@ -85,12 +102,13 @@ public class RoleController {
 
     /**
      * 查询所有角色Id
+     *
      * @return 返回列表
      */
     @ApiOperation("查询所有角色Id")
     @ApiOperationSupport(order = 502)
     @GetMapping("/selectRoleIds")
-    public JsonResult<List<Long>> selectRoleIds(){
+    public JsonResult<List<Long>> selectRoleIds() {
         log.debug("开始处理查询所有角色Id的功能");
         List<Long> longs = roleService.selectRoleId();
         return JsonResult.ok(longs);

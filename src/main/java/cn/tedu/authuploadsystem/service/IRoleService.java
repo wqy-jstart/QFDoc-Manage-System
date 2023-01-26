@@ -1,5 +1,6 @@
 package cn.tedu.authuploadsystem.service;
 
+import cn.tedu.authuploadsystem.pojo.dto.RoleUpdateDTO;
 import cn.tedu.authuploadsystem.pojo.entity.Role;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,12 @@ import java.util.List;
  */
 @Transactional
 public interface IRoleService extends IService<Role>{
+
+    /**
+     * 修改角色
+     * @param roleUpdateDTO 修改角色的信息
+     */
+    void update(RoleUpdateDTO roleUpdateDTO);
 
     /**
      * 查询角色列表

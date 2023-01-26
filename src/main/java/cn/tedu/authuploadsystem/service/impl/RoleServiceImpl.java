@@ -3,10 +3,12 @@ package cn.tedu.authuploadsystem.service.impl;
 import cn.tedu.authuploadsystem.ex.ServiceException;
 import cn.tedu.authuploadsystem.mapper.RoleMapper;
 import cn.tedu.authuploadsystem.mapper.UserMapper;
+import cn.tedu.authuploadsystem.pojo.dto.RoleUpdateDTO;
 import cn.tedu.authuploadsystem.pojo.entity.Role;
 import cn.tedu.authuploadsystem.pojo.entity.User;
 import cn.tedu.authuploadsystem.service.IRoleService;
 import cn.tedu.authuploadsystem.web.ServiceCode;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +37,38 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     @Autowired
     private UserMapper userMapper;
 
-    public RoleServiceImpl(){
+    public RoleServiceImpl() {
         log.debug("创建业务层实现类：RoleServiceImpl");
     }
 
     /**
+     * 执行修改角色的业务
+     *
+     * @param roleUpdateDTO 修改角色的信息
+     */
+    @Override
+    public void update(RoleUpdateDTO roleUpdateDTO) {
+        QueryWrapper<Role> wrapper = new QueryWrapper<>();
+        wrapper.ne("id",roleUpdateDTO.getId());
+        wrapper.eq("name",roleUpdateDTO.getName());
+        Role queryRole = roleMapper.selectOne(wrapper);
+        if (queryRole != null){
+            String message = "修改失败，该角色名称已存在！";
+            log.debug(message);
+            throw new ServiceException(ServiceCode.ERROR_CONFLICT,message);
+        }
+        log.debug("开始处理修改角色信息的功能，参数：{}", roleUpdateDTO);
+        int rows = roleMapper.update(roleUpdateDTO);
+        if (rows > 1) {
+            String message = "修改失败，服务器忙，请稍后再试！";
+            log.debug(message);
+            throw new ServiceException(ServiceCode.ERR_UPDATE, message);
+        }
+    }
+
+    /**
      * 处理查询角色列表的功能
+     *
      * @return 返回列表
      */
     @Override
@@ -51,17 +79,18 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
 
     /**
      * 根据角色id查询角色详情信息
+     *
      * @param roleId 角色Id
      * @return 返回角色详情类
      */
     @Override
     public Role selectById(Long roleId) {
-        log.debug("开始处理查询id为：{}的角色详情",roleId);
+        log.debug("开始处理查询id为：{}的角色详情", roleId);
         Role queryRole = roleMapper.selectById(roleId);
-        if (queryRole == null){
+        if (queryRole == null) {
             String message = "查询失败，该角色不存在！";
             log.debug(message);
-            throw new ServiceException(ServiceCode.ERR_NOT_FOUND,message);
+            throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
         }
 
         return queryRole;
@@ -69,17 +98,18 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
 
     /**
      * 根据用户id查询角色的名称列表
+     *
      * @param userId 用户id
      * @return 返回角色列表
      */
     @Override
     public List<Long> selectToUserId(Long userId) {
-        log.debug("开始处理根据用户id查询角色名称列表，参数:{}",userId);
+        log.debug("开始处理根据用户id查询角色名称列表，参数:{}", userId);
         User queryUser = userMapper.selectById(userId);
-        if (queryUser == null){
+        if (queryUser == null) {
             String message = "查询失败，该用户不存在！";
             log.debug(message);
-            throw new ServiceException(ServiceCode.ERR_NOT_FOUND,message);
+            throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
         }
 
         return roleMapper.selectToUserId(userId);
@@ -87,6 +117,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
 
     /**
      * 查询所有角色Id
+     *
      * @return 返回列表
      */
     @Override
