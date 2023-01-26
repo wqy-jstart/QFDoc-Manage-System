@@ -50,6 +50,24 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     }
 
     /**
+     * 根据角色id查询角色详情信息
+     * @param roleId 角色Id
+     * @return 返回角色详情类
+     */
+    @Override
+    public Role selectById(Long roleId) {
+        log.debug("开始处理查询id为：{}的角色详情",roleId);
+        Role queryRole = roleMapper.selectById(roleId);
+        if (queryRole == null){
+            String message = "查询失败，该角色不存在！";
+            log.debug(message);
+            throw new ServiceException(ServiceCode.ERR_NOT_FOUND,message);
+        }
+
+        return queryRole;
+    }
+
+    /**
      * 根据用户id查询角色的名称列表
      * @param userId 用户id
      * @return 返回角色列表

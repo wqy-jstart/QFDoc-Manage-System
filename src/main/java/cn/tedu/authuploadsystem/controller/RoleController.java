@@ -52,6 +52,21 @@ public class RoleController {
     }
 
     /**
+     * 根据id查询角色详情
+     * @param roleId 角色id
+     * @return 返回角色详情
+     */
+    @ApiOperation("根据id查询角色详情")
+    @ApiOperationSupport(order = 500)
+    @ApiImplicitParam(name = "roleId",value = "角色Id",required = true,dataType = "long")
+    @PostMapping("/{roleId:[0-9]+}/selectById")
+    public JsonResult<Role> selectById(@PathVariable Long roleId){
+        log.debug("开始处理查询id为：{}的角色详情",roleId);
+        Role role = roleService.selectById(roleId);
+        return JsonResult.ok(role);
+    }
+
+    /**
      * 根据用户Id查询角色名称列表
      *
      * @param userId 用户id

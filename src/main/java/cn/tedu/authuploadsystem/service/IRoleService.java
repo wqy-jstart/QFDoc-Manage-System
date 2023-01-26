@@ -23,6 +23,13 @@ public interface IRoleService extends IService<Role>{
     List<Role> selectList();
 
     /**
+     * 根据角色Id查询详情
+     * @param roleId 角色Id
+     * @return 返回详情信息
+     */
+    Role selectById(Long roleId);
+
+    /**
      * 根据用户id查询对应的角色名称列表
      * @param userId 用户id
      * @return 返回角色列表
