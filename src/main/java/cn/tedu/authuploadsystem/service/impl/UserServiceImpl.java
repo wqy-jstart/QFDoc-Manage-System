@@ -223,10 +223,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             log.debug(message);
             throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
         }
-
+        if (!userUpdateDTO.getUsername().equals(queryUser.getUsername())) {
+            // 检查用户名是否存在
+            QueryWrapper<User> wrapperToUpdate = new QueryWrapper<>();
+            wrapperToUpdate.eq("username", userUpdateDTO.getUsername());
+            User queryUserToUpdate = userMapper.selectOne(wrapperToUpdate);
+            if (queryUserToUpdate != null) {
+                String message = "用户修改失败，该用户名已经存在！";
+                log.debug(message);
+                throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+            }
+        }
         log.debug("即将修改用户信息...");
         User user = new User();
         BeanUtils.copyProperties(userUpdateDTO, user);
+        user.setPassword(BCryptEncode.encryptionPassword(userUpdateDTO.getPassword()));
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("id", user.getId());
         int rows = userMapper.update(user, wrapper);
