@@ -275,6 +275,11 @@ public class BucketServiceImpl implements IBucketService {
                     throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
                 }
                 String str = body.string();
+                if ("{}".equals(str)){
+                    String message = "查询失败，该存储空间暂无标签！";
+                    log.debug(message);
+                    throw new ServiceException(ServiceCode.ERR_NOT_FOUND,message);
+                }
                 int start = str.indexOf(":") + 1;
                 int end = str.lastIndexOf("}");
                 String result = str.substring(start, end);
