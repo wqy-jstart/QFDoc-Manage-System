@@ -22,4 +22,18 @@ public interface RolePermissionMapper extends BaseMapper<RolePermission> {
      * @return 返回权限id列表
      */
     List<Long> selectToRoleId(Long roleId);
+
+    /**
+     * 根据角色id批量插入角色权限关联表
+     * @param rolePermissions 批量插入关联表信息需要的数组
+     */
+    int insertBatch(RolePermission[] rolePermissions);
+
+    /**
+     * 批量删除分配前的角色id
+     * @param roleId 角色id
+     * @param rolePermissions 角色权限数组
+     * @return 返回删除的数量
+     */
+    int deleteBatch(Long roleId,RolePermission[] rolePermissions);
 }

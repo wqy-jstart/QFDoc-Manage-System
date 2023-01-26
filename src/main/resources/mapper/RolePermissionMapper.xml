@@ -11,4 +11,24 @@
                       on a_role.id = a_role_permission.role_id
         where a_role.id = #{roleId};
     </select>
+
+    <!--int insertBatch(RolePermission[] rolePermissions);-->
+    <insert id="insertBatch" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO a_role_permission(
+        role_id,permission_id,gmt_create,gmt_modified
+        )VALUES
+        <foreach collection="array" item="rolePermission" separator=",">
+            (#{rolePermission.roleId},#{rolePermission.permissionId},#{rolePermission.gmtCreate},#{rolePermission.gmtModified})
+        </foreach>
+    </insert>
+
+    <!--int deleteBatch(Long roleId,RolePermission[] rolePermissions);-->
+    <delete id="deleteBatch">
+        delete from a_role_permission where role_id = #{roleId} and permission_id in
+        (
+        <foreach collection="rolePermissions" item="rolePermission" separator=",">
+            #{rolePermission.permissionId}
+        </foreach>
+        )
+    </delete>
 </mapper>

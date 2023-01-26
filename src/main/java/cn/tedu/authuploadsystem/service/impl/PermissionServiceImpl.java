@@ -4,9 +4,8 @@ import cn.tedu.authuploadsystem.ex.ServiceException;
 import cn.tedu.authuploadsystem.mapper.PermissionMapper;
 import cn.tedu.authuploadsystem.mapper.RoleMapper;
 import cn.tedu.authuploadsystem.mapper.RolePermissionMapper;
-import cn.tedu.authuploadsystem.pojo.entity.Permission;
-import cn.tedu.authuploadsystem.pojo.entity.Role;
-import cn.tedu.authuploadsystem.pojo.entity.RolePermission;
+import cn.tedu.authuploadsystem.pojo.dto.AssignToPermission;
+import cn.tedu.authuploadsystem.pojo.entity.*;
 import cn.tedu.authuploadsystem.service.IPermissionService;
 import cn.tedu.authuploadsystem.web.ServiceCode;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -43,6 +42,12 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
 
     public PermissionServiceImpl() {
         log.debug("创建业务层接口实现类：PermissionServiceImpl");
+    }
+
+    @Override
+    public void assignToPermission(AssignToPermission assignToPermission) {
+        log.debug("开始处理给角色：{}分配权限的功能", assignToPermission.getName());
+
     }
 
     /**
@@ -89,5 +94,50 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         }
 
         return rolePermissionMapper.selectToRoleId(roleId);
+    }
+
+    @Override
+    public void insertBatch(AssignToPermission assignToPermission) {
+        log.debug("开始处理给角色：{}分配权限的功能", assignToPermission.getName());
+        QueryWrapper<Role> wrapper = new QueryWrapper<>();
+        wrapper.eq("name", assignToPermission.getName());
+        Role queryRole = roleMapper.selectOne(wrapper);
+        if (queryRole == null) {
+            String message = "查询失败，该角色不存在！";
+            log.debug(message);
+            throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+        }
+        RolePermission[] rolePermissions = null;
+
+        // 批量删除用户角色关联信息
+        Long[] oldPermissionIds = assignToPermission.getOldPermissionIds();
+        rolePermissions = new RolePermission[oldPermissionIds.length];
+        for (int i = 0; i < oldPermissionIds.length; i++) {
+            RolePermission permission = new RolePermission();
+            permission.setRoleId(queryRole.getId());
+            permission.setPermissionId(oldPermissionIds[i]);
+            rolePermissions[i] = permission;
+        }
+        int rows1 = rolePermissionMapper.deleteBatch(queryRole.getId(), rolePermissions);
+        if (rows1 > oldPermissionIds.length) {
+            String message = "分配失败，服务器忙，请稍后再试！";
+            log.debug(message);
+            throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
+        }
+
+        Long[] permissionIds = assignToPermission.getPermissionIds();
+        rolePermissions = new RolePermission[permissionIds.length];
+        for (int i = 0; i < permissionIds.length; i++) {
+            RolePermission rolePermission = new RolePermission();
+            rolePermission.setRoleId(queryRole.getId());
+            rolePermission.setPermissionId(permissionIds[i]);
+            rolePermissions[i] = rolePermission;
+        }
+        int rows = rolePermissionMapper.insertBatch(rolePermissions);
+        if (rows > permissionIds.length) {
+            String message = "添加失败，服务器忙，请稍后再试！";
+            log.debug(message);
+            throw new ServiceException(ServiceCode.ERR_INSERT, message);
+        }
     }
 }

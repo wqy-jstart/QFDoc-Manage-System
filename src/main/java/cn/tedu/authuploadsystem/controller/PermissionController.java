@@ -1,5 +1,7 @@
 package cn.tedu.authuploadsystem.controller;
 
+import cn.tedu.authuploadsystem.pojo.dto.AssignToPermission;
+import cn.tedu.authuploadsystem.pojo.dto.AssignToRole;
 import cn.tedu.authuploadsystem.pojo.entity.Permission;
 import cn.tedu.authuploadsystem.service.IPermissionService;
 import cn.tedu.authuploadsystem.web.JsonResult;
@@ -55,7 +57,7 @@ public class PermissionController {
      */
     @ApiOperation("查询所有权限id")
     @ApiOperationSupport(order = 501)
-    @GetMapping("/selectIds")
+    @GetMapping("/selectPermissionIds")
     public JsonResult<List<Long>> selectIds() {
         log.debug("开始处理查询所有权限id的功能，无参！");
         List<Long> longs = permissionService.selectToId();
@@ -76,5 +78,20 @@ public class PermissionController {
         log.debug("开始处理查询角色id：{}的权限列表", roleId);
         List<Long> longs = permissionService.selectToRoleId(roleId);
         return JsonResult.ok(longs);
+    }
+
+    /**
+     * 分配用户权限信息
+     *
+     * @param assignToPermission 传递分配的信息
+     * @return 返回结果集
+     */
+    @ApiOperation("分配用户权限信息")
+    @ApiOperationSupport(order = 100)
+    @PostMapping("/assignToPermission")
+    public JsonResult<Void> insertBatch(AssignToPermission assignToPermission) {
+        log.debug("开始处理分配角色批量插入角色权限表信息,参数：{}", assignToPermission);
+        permissionService.insertBatch(assignToPermission);
+        return JsonResult.ok();
     }
 }
