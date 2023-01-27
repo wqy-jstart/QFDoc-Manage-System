@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +48,7 @@ public class RoleController {
      */
     @ApiOperation("添加角色")
     @ApiOperationSupport(order = 100)
+    @PreAuthorize("hasAuthority('/auth/assign')")
     @PostMapping("/insert")
     public JsonResult<Void> insert(RoleAddNewDTO roleAddNewDTO) {
         log.debug("开始处理添加角色的请求，参数：{}", roleAddNewDTO);
@@ -62,6 +64,7 @@ public class RoleController {
      */
     @ApiOperation("根据id修改角色")
     @ApiOperationSupport(order = 100)
+    @PreAuthorize("hasAuthority('/auth/assign')")
     @PostMapping("/update")
     public JsonResult<Void> update(RoleUpdateDTO roleUpdateDTO) {
         log.debug("开始处理修改角色的业务,无参！");
@@ -76,6 +79,7 @@ public class RoleController {
      */
     @ApiOperation("查询角色列表")
     @ApiOperationSupport(order = 500)
+    @PreAuthorize("hasAuthority('/auth/assign')")
     @GetMapping("")
     public JsonResult<List<Role>> selectList() {
         log.debug("开始处理查询角色列表的请求，无参！");

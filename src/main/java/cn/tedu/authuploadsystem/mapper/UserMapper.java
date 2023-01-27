@@ -1,6 +1,7 @@
 package cn.tedu.authuploadsystem.mapper;
 
 import cn.tedu.authuploadsystem.pojo.entity.User;
+import cn.tedu.authuploadsystem.pojo.vo.UserLoginInfoVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +14,11 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface UserMapper extends BaseMapper<User> {
+
+    /**
+     * 根据用户名查询登录的信息
+     * @param username 用户名
+     * @return 返回登录的VO类信息(id,username,password,enable,permissions)
+     */
+    UserLoginInfoVO getLoginInfoByUsername(String username);
 }

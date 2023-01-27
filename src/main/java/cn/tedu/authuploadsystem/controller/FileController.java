@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,6 +54,7 @@ public class FileController {
      */
     @ApiOperation("文件上传")
     @ApiOperationSupport(order = 100)
+    @PreAuthorize("hasAuthority('/file/upload')")
     @PostMapping("/image")
     public JsonResult<String> uploadImg(MultipartFile file) throws JSONException {
         System.out.println("图片名称:" + file);
@@ -91,6 +93,7 @@ public class FileController {
             @ApiImplicitParam(name = "bucketName", value = "存储空间名", required = true, dataType = "string"),
             @ApiImplicitParam(name = "key", value = "文件名", required = true, dataType = "string"),
     })
+    @PreAuthorize("hasAuthority('/file/delete')")
     @PostMapping("/{bucketName}/{key}/deleteToFile")
     public JsonResult<String> deleteToFile(@PathVariable String bucketName,
                                            @PathVariable String key) {
@@ -112,6 +115,7 @@ public class FileController {
             @ApiImplicitParam(name = "bucketName", value = "存储空间名", required = true, dataType = "string"),
             @ApiImplicitParam(name = "key", value = "文件名", required = true, dataType = "string"),
     })
+    @PreAuthorize("hasAuthority('/file/updateSpaceStatus')")
     @PostMapping("/{bucketName}/{key}/setFileStatusToEnable")
     public JsonResult<String> setFileStatusToEnable(@PathVariable String bucketName,
                                                     @PathVariable String key) {
@@ -134,6 +138,7 @@ public class FileController {
             @ApiImplicitParam(name = "bucketName", value = "存储空间名", required = true, dataType = "string"),
             @ApiImplicitParam(name = "key", value = "文件名", required = true, dataType = "string"),
     })
+    @PreAuthorize("hasAuthority('/file/updateSpaceStatus')")
     @PostMapping("/{bucketName}/{key}/setFileStatusToDisable")
     public JsonResult<String> setFileStatusToDisable(@PathVariable String bucketName,
                                                      @PathVariable String key) {
@@ -150,6 +155,7 @@ public class FileController {
      */
     @ApiOperation("复制文件")
     @ApiOperationSupport(order = 403)
+    @PreAuthorize("hasAuthority('/file/copy')")
     @PostMapping("/copyToFile")
     public JsonResult<String> copyToFile(@Valid CopyToFile copyToFile) {
         log.debug("开始处理复制文件的请求---存储空间名：{}；源文件：{}；目标文件：{}；是否覆盖：{}", copyToFile.getBucketName(),
@@ -171,6 +177,7 @@ public class FileController {
             @ApiImplicitParam(name = "bucketName", value = "存储空间名", required = true, dataType = "string"),
             @ApiImplicitParam(name = "fileName", value = "文件名", required = true, dataType = "string"),
     })
+    @PreAuthorize("hasAuthority('/file/updateSpaceTyp')")
     @PostMapping("/{bucketName}/{fileName}/setBucketType0")
     public JsonResult<String> setBucketType0(@PathVariable String bucketName, @PathVariable String fileName) {
         log.debug("开始处理修改文件访问类型，存储空间：{}，文件名：{} ---标准访问类型", bucketName, fileName);
@@ -191,6 +198,7 @@ public class FileController {
             @ApiImplicitParam(name = "bucketName", value = "存储空间名", required = true, dataType = "string"),
             @ApiImplicitParam(name = "fileName", value = "文件名", required = true, dataType = "string"),
     })
+    @PreAuthorize("hasAuthority('/file/updateSpaceTyp')")
     @PostMapping("/{bucketName}/{fileName}/setBucketType1")
     public JsonResult<String> setBucketType1(@PathVariable String bucketName, @PathVariable String fileName) {
         log.debug("开始处理修改文件访问类型，存储空间：{}，文件名：{} ---低频访问类型", bucketName, fileName);
@@ -211,6 +219,7 @@ public class FileController {
             @ApiImplicitParam(name = "bucketName", value = "存储空间名", required = true, dataType = "string"),
             @ApiImplicitParam(name = "fileName", value = "文件名", required = true, dataType = "string"),
     })
+    @PreAuthorize("hasAuthority('/file/updateSpaceTyp')")
     @PostMapping("/{bucketName}/{fileName}/setBucketType2")
     public JsonResult<String> setBucketType2(@PathVariable String bucketName, @PathVariable String fileName) {
         log.debug("开始处理修改文件访问类型，存储空间：{}，文件名：{} ---归档访问类型", bucketName, fileName);
@@ -231,6 +240,7 @@ public class FileController {
             @ApiImplicitParam(name = "bucketName", value = "存储空间名", required = true, dataType = "string"),
             @ApiImplicitParam(name = "fileName", value = "文件名", required = true, dataType = "string"),
     })
+    @PreAuthorize("hasAuthority('/file/updateSpaceTyp')")
     @PostMapping("/{bucketName}/{fileName}/setBucketType3")
     public JsonResult<String> setBucketType3(@PathVariable String bucketName, @PathVariable String fileName) {
         log.debug("开始处理修改文件访问类型，存储空间：{}，文件名：{} ---深度归档访问类型", bucketName, fileName);
@@ -253,6 +263,7 @@ public class FileController {
             @ApiImplicitParam(name = "fileName", value = "文件名", required = true, dataType = "string"),
             @ApiImplicitParam(name = "time", value = "解冻有效时间", required = true, dataType = "string"),
     })
+    @PreAuthorize("hasAuthority('/file/updateSpaceTyp')")
     @PostMapping("/{bucketName}/{fileName}/{time}/fileToThaw")
     public JsonResult<String> fileToThaw(@PathVariable String bucketName,
                                          @PathVariable String fileName,
@@ -277,6 +288,7 @@ public class FileController {
             @ApiImplicitParam(name = "fileName", value = "文件名", required = true, dataType = "string"),
             @ApiImplicitParam(name = "days", value = "过期时间", required = true, dataType = "int"),
     })
+    @PreAuthorize("hasAuthority('/file/updateDelTime')")
     @PostMapping("/{bucketName}/{fileName}/{days:[0-9]+}/setOverTime")
     public JsonResult<String> setOverTime(@PathVariable String bucketName,
                                           @PathVariable String fileName,

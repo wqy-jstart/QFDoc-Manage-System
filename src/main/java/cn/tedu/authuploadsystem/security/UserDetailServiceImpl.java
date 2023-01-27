@@ -2,6 +2,7 @@ package cn.tedu.authuploadsystem.security;
 
 import cn.tedu.authuploadsystem.mapper.UserMapper;
 import cn.tedu.authuploadsystem.pojo.entity.User;
+import cn.tedu.authuploadsystem.pojo.vo.UserLoginInfoVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +38,8 @@ public class UserDetailServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         log.debug("Spring Security框架自动调用UserDetailServiceImpl中的loadUserByUsername方法,参数{}", s);
 
-        QueryWrapper<User> wrapper = new QueryWrapper<>(); // 构造wrapper利用用户名查询用户信息
-        wrapper.eq("username", s);
-        User admin = userMapper.selectOne(wrapper);
+        // 调用持久层的方法获取登录认证所需要的信息
+        UserLoginInfoVO admin = userMapper.getLoginInfoByUsername(s);
         log.debug("从数据库中根据用户名[{}]查询管理员信息,结果:{}", s, admin);
 
         if (admin == null) {// 判断查询的admin是否为Null?
@@ -49,10 +49,11 @@ public class UserDetailServiceImpl implements UserDetailsService {
         }
 
         // 添加权限信息
-        // TODO 添加权限
         List<GrantedAuthority> authorities = new ArrayList<>();
-        GrantedAuthority authority = new SimpleGrantedAuthority("这是一条假的权限信息");
-        authorities.add(authority);
+        for (String permission : admin.getPermissions()) {
+            GrantedAuthority authority = new SimpleGrantedAuthority(permission);
+            authorities.add(authority);
+        }
 
         // 使用新建的继承Spring Security的类AdminDetails来返回信息便于认证
         AdminDetails adminDetails = new AdminDetails(

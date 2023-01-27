@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +44,7 @@ public class PermissionController {
      */
     @ApiOperation("查询权限列表")
     @ApiOperationSupport(order = 500)
+    @PreAuthorize("hasAuthority('/auth/assign')")
     @GetMapping("")
     public JsonResult<List<Permission>> selectList() {
         log.debug("开始处理查询权限列表的功能，无参！");

@@ -63,8 +63,9 @@ public class UserController {
      * @param userAddNewDTO 添加的用户信息
      * @return 返回结果集
      */
-    @ApiOperation("后天添加用户")
+    @ApiOperation("后台添加用户")
     @ApiOperationSupport(order = 101)
+    @PreAuthorize("hasAuthority('/user/insert')")
     @PostMapping("/insertToAdmin")
     public JsonResult<Void> insert(UserAddNewDTO userAddNewDTO) {
         log.debug("开始处理添加用户的功能，参数：{}", userAddNewDTO);
@@ -89,12 +90,14 @@ public class UserController {
 
     /**
      * 根据id删除用户信息
+     *
      * @param id 用户id
      * @return 返回结果集
      */
     @ApiOperation("根据id删除用户信息")
     @ApiOperationSupport(order = 300)
     @ApiImplicitParam(name = "id", value = "用户id", required = true, dataType = "long")
+    @PreAuthorize("hasAuthority('/user/delete')")
     @PostMapping("/{id:[0-9]+}/deleteById")
     public JsonResult<Void> deleteById(@Range(min = 1, message = "删除失败,参数无效!")
                                        @PathVariable Long id) {
@@ -111,6 +114,7 @@ public class UserController {
      */
     @ApiOperation("根据id修改用户")
     @ApiOperationSupport(order = 400)
+    @PreAuthorize("hasAuthority('/user/update')")
     @PostMapping("/update")
     public JsonResult<Void> update(@Valid UserUpdateDTO userUpdateDTO) {
         log.debug("开始处理根据id{}修改用户信息的请求", userUpdateDTO.getId());
@@ -142,6 +146,7 @@ public class UserController {
      */
     @ApiOperation("查询用户列表")
     @ApiOperationSupport(order = 501)
+    @PreAuthorize("hasAuthority('/user/read')")
     @GetMapping("/selectList")
     public JsonResult<List<User>> selectList() {
         log.debug("开始处理查询用户列表的功能,无参!");
