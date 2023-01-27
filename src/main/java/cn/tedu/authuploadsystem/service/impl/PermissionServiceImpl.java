@@ -96,6 +96,11 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
         return rolePermissionMapper.selectToRoleId(roleId);
     }
 
+    /**
+     * 处理分配权限时删除原来的权限与添加新权限的功能
+     *
+     * @param assignToPermission 分配权限的信息
+     */
     @Override
     public void insertBatch(AssignToPermission assignToPermission) {
         log.debug("开始处理给角色：{}分配权限的功能", assignToPermission.getName());

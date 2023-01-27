@@ -3,6 +3,7 @@ package cn.tedu.authuploadsystem.service.impl;
 import cn.tedu.authuploadsystem.ex.ServiceException;
 import cn.tedu.authuploadsystem.mapper.RoleMapper;
 import cn.tedu.authuploadsystem.mapper.UserMapper;
+import cn.tedu.authuploadsystem.pojo.dto.RoleAddNewDTO;
 import cn.tedu.authuploadsystem.pojo.dto.RoleUpdateDTO;
 import cn.tedu.authuploadsystem.pojo.entity.Role;
 import cn.tedu.authuploadsystem.pojo.entity.User;
@@ -11,6 +12,7 @@ import cn.tedu.authuploadsystem.web.ServiceCode;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,6 +44,34 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     }
 
     /**
+     * 处理添加角色的功能
+     *
+     * @param roleAddNewDTO 添加角色的信息
+     */
+    @Override
+    public void insert(RoleAddNewDTO roleAddNewDTO) {
+        log.debug("开始处理添加角色的业务，参数：{}", roleAddNewDTO);
+        // 检查角色名称是否存在
+        QueryWrapper<Role> wrapper = new QueryWrapper<>();
+        wrapper.eq("name", roleAddNewDTO.getName());
+        Role queryRole = roleMapper.selectOne(wrapper);
+        if (queryRole != null) {
+            String message = "添加失败，该用户名已存在！";
+            log.debug(message);
+            throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
+        }
+
+        Role role = new Role();
+        BeanUtils.copyProperties(roleAddNewDTO, role);
+        int rows = roleMapper.insert(role);
+        if (rows > 1) {
+            String message = "添加失败，服务器忙，请稍后再试！";
+            log.debug(message);
+            throw new ServiceException(ServiceCode.ERR_INSERT, message);
+        }
+    }
+
+    /**
      * 执行修改角色的业务
      *
      * @param roleUpdateDTO 修改角色的信息
@@ -49,13 +79,13 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     @Override
     public void update(RoleUpdateDTO roleUpdateDTO) {
         QueryWrapper<Role> wrapper = new QueryWrapper<>();
-        wrapper.ne("id",roleUpdateDTO.getId());
-        wrapper.eq("name",roleUpdateDTO.getName());
+        wrapper.ne("id", roleUpdateDTO.getId());
+        wrapper.eq("name", roleUpdateDTO.getName());
         Role queryRole = roleMapper.selectOne(wrapper);
-        if (queryRole != null){
+        if (queryRole != null) {
             String message = "修改失败，该角色名称已存在！";
             log.debug(message);
-            throw new ServiceException(ServiceCode.ERROR_CONFLICT,message);
+            throw new ServiceException(ServiceCode.ERROR_CONFLICT, message);
         }
         log.debug("开始处理修改角色信息的功能，参数：{}", roleUpdateDTO);
         int rows = roleMapper.update(roleUpdateDTO);

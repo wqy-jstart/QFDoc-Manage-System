@@ -1,5 +1,6 @@
 package cn.tedu.authuploadsystem.service;
 
+import cn.tedu.authuploadsystem.pojo.dto.RoleAddNewDTO;
 import cn.tedu.authuploadsystem.pojo.dto.RoleUpdateDTO;
 import cn.tedu.authuploadsystem.pojo.entity.Role;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -16,6 +17,12 @@ import java.util.List;
  */
 @Transactional
 public interface IRoleService extends IService<Role>{
+
+    /**
+     * 添加角色的功能
+     * @param roleAddNewDTO 添加角色的信息
+     */
+    void insert(RoleAddNewDTO roleAddNewDTO);
 
     /**
      * 修改角色

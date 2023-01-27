@@ -1,5 +1,6 @@
 package cn.tedu.authuploadsystem.controller;
 
+import cn.tedu.authuploadsystem.pojo.dto.RoleAddNewDTO;
 import cn.tedu.authuploadsystem.pojo.dto.RoleUpdateDTO;
 import cn.tedu.authuploadsystem.pojo.entity.Role;
 import cn.tedu.authuploadsystem.service.IRoleService;
@@ -36,6 +37,21 @@ public class RoleController {
 
     public RoleController() {
         log.debug("创建控制器类：RoleController");
+    }
+
+    /**
+     * 处理添加角色的请求
+     *
+     * @param roleAddNewDTO 添加的角色信息
+     * @return 返回结果集
+     */
+    @ApiOperation("添加角色")
+    @ApiOperationSupport(order = 100)
+    @PostMapping("/insert")
+    public JsonResult<Void> insert(RoleAddNewDTO roleAddNewDTO) {
+        log.debug("开始处理添加角色的请求，参数：{}", roleAddNewDTO);
+        roleService.insert(roleAddNewDTO);
+        return JsonResult.ok();
     }
 
     /**
