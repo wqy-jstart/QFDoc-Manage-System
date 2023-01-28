@@ -25,7 +25,7 @@ public interface IUserRedisRepository {
      *
      * @param userStandardVO 需要向Redis中存储的用户详情VO类
      */
-    void save(UserStandardVO userStandardVO);
+    void save(User userStandardVO);
 
     /**
      * 该方法用来存储多条用户数据,空返回
@@ -49,7 +49,7 @@ public interface IUserRedisRepository {
      * @param id 用户id
      * @return 返回用户详情VO类
      */
-    UserStandardVO get(Long id);
+    User get(Long id);
 
     /**
      * 该方法用来取出所有用户列表,无参

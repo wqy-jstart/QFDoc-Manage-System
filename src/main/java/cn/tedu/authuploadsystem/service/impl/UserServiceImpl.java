@@ -10,6 +10,8 @@ import cn.tedu.authuploadsystem.pojo.dto.UserLoginDTO;
 import cn.tedu.authuploadsystem.pojo.dto.UserUpdateDTO;
 import cn.tedu.authuploadsystem.pojo.entity.User;
 import cn.tedu.authuploadsystem.pojo.entity.UserRole;
+import cn.tedu.authuploadsystem.pojo.vo.UserStandardVO;
+import cn.tedu.authuploadsystem.repo.IUserRedisRepository;
 import cn.tedu.authuploadsystem.security.AdminDetails;
 import cn.tedu.authuploadsystem.service.IUserService;
 import cn.tedu.authuploadsystem.util.BCryptEncode;
@@ -64,6 +66,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     // 注入认证器接口对象
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    // 注入用户缓存的接口
+    @Autowired
+    private IUserRedisRepository userRedisRepository;
 
     /**
      * 处理用户注册的功能
@@ -257,13 +263,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public User selectById(Long id) {
         log.debug("开始处理根据id{}查询用户的一条数据", id);
-        User queryUser = userMapper.selectById(id);
-        if (queryUser == null) {
+        log.debug("将从Redis中查询数据！");
+        User user = userRedisRepository.get(id);
+        if (user != null) {
+            log.debug("命中缓存,即将返回:{}", user);
+            return user;
+        }
+        log.debug("未命中缓存,即将向数据库中查询数据");
+        user = userMapper.selectById(id);
+        if (user == null) {
             String message = "查询失败，该用户信息不存在";
             log.debug(message);
             throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
         }
-        return queryUser;
+        // 将查询结果写入到缓存,并返回
+        log.debug("从数据库中查询到有效结果,将查询结果存入到Redis中:{}", user);
+        userRedisRepository.save(user);
+        log.debug("开始返回结果!");
+        return user;
     }
 
     /**
@@ -274,7 +291,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public List<User> selectList() {
         log.debug("开始处理查询用户列表的功能，无参！");
-        return userMapper.selectList(null);
+        return userRedisRepository.list();
     }
 
     /**

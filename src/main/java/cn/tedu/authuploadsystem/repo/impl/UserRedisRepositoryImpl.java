@@ -35,11 +35,11 @@ public class UserRedisRepositoryImpl implements IUserRedisRepository {
 
     // 实现向Redis中写入数据的业务
     @Override
-    public void save(UserStandardVO userStandardVO) {
+    public void save(User userStandardVO) {
         String key = USER_ITEM_KEY_PREFIX + userStandardVO.getId();// 这样存储便于在Redis中归类呈现
         // ★向Redis的用户中的brand:item-keys里,添加该次添加的用户key值,为了删除时直接遍历里面item的key值作删除
         log.debug("向Set集合中存入此次查找的Key值");
-        redisTemplate.opsForSet().add(USER_ITEM_KEYS_KEY, key);
+        redisTemplate.opsForSet().add(USER_ITEM_KEYS_KEY, key);// 将key单独写到一个key中
         redisTemplate.opsForValue().set(key, userStandardVO);// 将对应的用户数据放到指定key中
         log.debug("向缓存中存入用户详情成功!");
     }
@@ -71,12 +71,12 @@ public class UserRedisRepositoryImpl implements IUserRedisRepository {
 
     // 实现根据key向Redis中获取一条用户数据的业务
     @Override
-    public UserStandardVO get(Long id) {
+    public User get(Long id) {
         Serializable serializable = redisTemplate.opsForValue().get(USER_ITEM_KEY_PREFIX + id);// 传入id与brand:item拼接成key
-        UserStandardVO userStandardVO = null;// 预先声明一个用户详情的引用
+        User userStandardVO = null;// 预先声明一个用户详情的引用
         if (serializable != null) { // 判断根据用户key返回的数据是否为null?
-            if (serializable instanceof UserStandardVO) { // 判断类型是否存在可转换的关系
-                userStandardVO = (UserStandardVO) serializable;// 将返回的Serializable强转为BrandStandardVO用户详情
+            if (serializable instanceof User) { // 判断类型是否存在可转换的关系
+                userStandardVO = (User) serializable;// 将返回的Serializable强转为BrandStandardVO用户详情
             }
         }
         return userStandardVO;// 最终作出返回

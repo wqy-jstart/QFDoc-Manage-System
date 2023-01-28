@@ -4,6 +4,7 @@ import cn.tedu.authuploadsystem.pojo.dto.UserAddNewDTO;
 import cn.tedu.authuploadsystem.pojo.dto.UserLoginDTO;
 import cn.tedu.authuploadsystem.pojo.dto.UserUpdateDTO;
 import cn.tedu.authuploadsystem.pojo.entity.User;
+import cn.tedu.authuploadsystem.pojo.vo.UserStandardVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.transaction.annotation.Transactional;
 
