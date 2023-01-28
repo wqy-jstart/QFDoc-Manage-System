@@ -52,8 +52,8 @@ public class CachePreload implements ApplicationRunner {
 
         // 重建用户的缓存
         log.debug("准备删除Redis缓存中的用户数据...");
-        userRedisRepository.deleteAll();// 清除缓存中的数据,防止缓存堆积过多,显示的列表数据冗余
-        log.debug("删除Redis缓存中的用户数据,完成!");
+        Long count = userRedisRepository.deleteAll();// 清除缓存中的数据,防止缓存堆积过多,显示的列表数据冗余
+        log.debug("删除Redis缓存中的用户数据,完成,数量为：{}",count);
 
         log.debug("准备从数据库中读取用户列表...");
         List<User> list = userMapper.selectList(null);
