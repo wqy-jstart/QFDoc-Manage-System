@@ -100,6 +100,13 @@
             <version>3.14.1</version>
         </dependency>
 
+        <!-- Spring Boot Data - ...  是Spring的一个系列框架-->
+        <!-- Spring Boot Data redis的依赖项,用于实现Redis编程 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
         <!-- Spring Boot security的依赖项,用于用户认证和用户授权 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
