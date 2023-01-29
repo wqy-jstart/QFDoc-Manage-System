@@ -107,6 +107,12 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
+        <!-- Spring Boot AOP的依赖项,用于实现切面编程 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
         <!-- Spring Boot security的依赖项,用于用户认证和用户授权 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
