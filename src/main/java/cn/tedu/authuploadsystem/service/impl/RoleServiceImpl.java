@@ -7,6 +7,7 @@ import cn.tedu.authuploadsystem.pojo.dto.RoleAddNewDTO;
 import cn.tedu.authuploadsystem.pojo.dto.RoleUpdateDTO;
 import cn.tedu.authuploadsystem.pojo.entity.Role;
 import cn.tedu.authuploadsystem.pojo.entity.User;
+import cn.tedu.authuploadsystem.repo.IRoleRedisRepository;
 import cn.tedu.authuploadsystem.service.IRoleService;
 import cn.tedu.authuploadsystem.web.ServiceCode;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -38,6 +39,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     // 注入用户持久层接口
     @Autowired
     private UserMapper userMapper;
+
+    // 注入角色Redis缓存接口
+    @Autowired
+    private IRoleRedisRepository roleRedisRepository;
 
     public RoleServiceImpl() {
         log.debug("创建业务层实现类：RoleServiceImpl");
@@ -104,7 +109,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     @Override
     public List<Role> selectList() {
         log.debug("开始处理查询角色列表的功能！无参");
-        return roleMapper.selectList(null);
+        return roleRedisRepository.list();
     }
 
     /**
@@ -116,14 +121,26 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     @Override
     public Role selectById(Long roleId) {
         log.debug("开始处理查询id为：{}的角色详情", roleId);
-        Role queryRole = roleMapper.selectById(roleId);
-        if (queryRole == null) {
+        log.debug("开始查询id为：{}的角色缓存...", roleId);
+        Role role = roleRedisRepository.get(roleId);
+        if (role != null) {
+            log.debug("命中缓存，即将返回！");
+            return role;
+        }
+
+        log.debug("未命中缓存，开始向数据库中查询id为：{}的角色数据...", roleId);
+        role = roleMapper.selectById(roleId);
+        if (role == null) {
             String message = "查询失败，该角色不存在！";
             log.debug(message);
             throw new ServiceException(ServiceCode.ERR_NOT_FOUND, message);
         }
 
-        return queryRole;
+        log.debug("从数据库中查询到id为：{}的角色数据,将查询结果放入缓存中！", roleId);
+        roleRedisRepository.save(role);
+        log.debug("开始返回结果！");
+
+        return role;
     }
 
     /**

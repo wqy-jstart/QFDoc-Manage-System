@@ -3,8 +3,10 @@ package cn.tedu.authuploadsystem.preload;
 import cn.tedu.authuploadsystem.mapper.UserMapper;
 import cn.tedu.authuploadsystem.mapper.RoleMapper;
 import cn.tedu.authuploadsystem.pojo.entity.Bucket;
+import cn.tedu.authuploadsystem.pojo.entity.Role;
 import cn.tedu.authuploadsystem.pojo.entity.User;
 import cn.tedu.authuploadsystem.repo.IBucketRedisRepository;
+import cn.tedu.authuploadsystem.repo.IRoleRedisRepository;
 import cn.tedu.authuploadsystem.repo.IUserRedisRepository;
 import cn.tedu.authuploadsystem.service.IBucketService;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +48,10 @@ public class CachePreload implements ApplicationRunner {
     @Autowired
     private IBucketRedisRepository bucketRedisRepository;
 
+    // 注入角色的Redis缓存接口
+    @Autowired
+    private IRoleRedisRepository roleRedisRepository;
+
     // 构造方法,使得启动项目时自动加载该组件类
     public CachePreload() {
         log.debug("创建开机自动执行的组件对象: CachePreload");
@@ -80,5 +86,18 @@ public class CachePreload implements ApplicationRunner {
         log.debug("准备将用户列表写入到Redis缓存...");
         userRedisRepository.save(list);
         log.debug("将用户列表写入到Redis缓存，完成！");
+
+        // 重建角色的缓存
+        log.debug("准备删除Redis缓存中的角色数据...");
+        Long countToRole = roleRedisRepository.deleteAll();// 清除缓存中的数据,防止缓存堆积过多,显示的列表数据冗余
+        log.debug("删除Redis缓存中的角色数据,完成,数量为：{}",countToRole);
+
+        log.debug("准备从数据库中读取角色列表...");
+        List<Role> listToRole = roleMapper.selectList(null);
+        log.debug("从数据库中读取角色列表，完成！");
+
+        log.debug("准备将角色列表写入到Redis缓存...");
+        roleRedisRepository.save(listToRole);
+        log.debug("将角色列表写入到Redis缓存，完成！");
     }
 }

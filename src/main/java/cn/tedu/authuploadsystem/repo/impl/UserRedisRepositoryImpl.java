@@ -32,7 +32,7 @@ public class UserRedisRepositoryImpl implements IUserRedisRepository {
     private RedisTemplate<String, Serializable> redisTemplate;
 
     public UserRedisRepositoryImpl() {
-        log.debug("创建处理缓存的数据访问实现类对象:BrandRedisRepositoryImpl");
+        log.debug("创建处理缓存的数据访问实现类对象:UserRedisRepositoryImpl");
     }
 
     // 实现向Redis中写入数据的业务
