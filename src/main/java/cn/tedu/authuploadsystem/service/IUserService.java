@@ -53,4 +53,9 @@ public interface IUserService extends IService<User> {
      */
     void setDisable(Long id);
 
+    /**
+     * 重建缓存
+     */
+    void rebuildCache();
+
 }

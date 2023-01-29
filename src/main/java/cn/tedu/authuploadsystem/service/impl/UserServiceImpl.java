@@ -320,6 +320,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     /**
+     * 重建用户缓存
+     */
+    @Override
+    public void rebuildCache() {
+        // 重建用户的缓存
+        log.debug("准备删除Redis缓存中的用户数据...");
+        Long countToUser = userRedisRepository.deleteAll();// 清除缓存中的数据,防止缓存堆积过多,显示的列表数据冗余
+        log.debug("删除Redis缓存中的用户数据,完成,数量为：{}",countToUser);
+
+        log.debug("准备从数据库中读取用户列表...");
+        List<User> list = userMapper.selectList(null);
+        log.debug("从数据库中读取用户列表，完成！");
+
+        log.debug("准备将用户列表写入到Redis缓存...");
+        userRedisRepository.save(list);
+        log.debug("将用户列表写入到Redis缓存，完成！");
+
+        log.debug("准备将各用户详情写入Redis缓存...");
+        for (User user : list) {
+            Long id = user.getId();
+            User userStandardVO = userMapper.selectById(id);
+            userRedisRepository.save(userStandardVO);
+        }
+        log.debug("将各用户详情写入到Redis缓存中,完成!");
+    }
+
+    /**
      * 该方法用来处理启用与禁用的逻辑
      *
      * @param id     id

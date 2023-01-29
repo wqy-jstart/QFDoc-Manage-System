@@ -55,4 +55,9 @@ public interface IRoleService extends IService<Role>{
      * @return 返回Id列表
      */
     List<Long> selectRoleId();
+
+    /**
+     * 重建缓存
+     */
+    void rebuildCache();
 }

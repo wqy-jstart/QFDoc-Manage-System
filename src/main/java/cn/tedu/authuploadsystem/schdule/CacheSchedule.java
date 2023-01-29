@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * @since 2023.1.28
  */
 @Slf4j
-//@Component // 声明一个组件类
+@Component // 声明一个组件类
 public class CacheSchedule {
 
     /*
@@ -36,4 +36,6 @@ public class CacheSchedule {
     // 注入角色持久层接口
     @Autowired
     private IRoleService roleService;
+
+
 }

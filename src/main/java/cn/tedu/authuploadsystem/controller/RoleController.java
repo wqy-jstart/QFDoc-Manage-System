@@ -133,4 +133,18 @@ public class RoleController {
         List<Long> longs = roleService.selectRoleId();
         return JsonResult.ok(longs);
     }
+
+    /**
+     * 重建角色缓存
+     *
+     * @return 返回结果集
+     */
+    @ApiOperation("重建角色缓存")
+    @ApiOperationSupport(order = 503)
+    @GetMapping("/cache/rebuild")
+    public JsonResult<Void> rebuildCache() {
+        log.debug("开始处理[重建缓存]的请求,无参数");
+        roleService.rebuildCache();
+        return JsonResult.ok();
+    }
 }

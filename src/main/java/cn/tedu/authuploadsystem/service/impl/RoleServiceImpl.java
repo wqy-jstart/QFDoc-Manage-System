@@ -177,4 +177,31 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
         }
         return roleIds;
     }
+
+    /**
+     * 重建角色缓存
+     */
+    @Override
+    public void rebuildCache() {
+        // 重建角色的缓存
+        log.debug("准备删除Redis缓存中的角色数据...");
+        Long countToRole = roleRedisRepository.deleteAll();// 清除缓存中的数据,防止缓存堆积过多,显示的列表数据冗余
+        log.debug("删除Redis缓存中的角色数据,完成,数量为：{}", countToRole);
+
+        log.debug("准备从数据库中读取角色列表...");
+        List<Role> listToRole = roleMapper.selectList(null);
+        log.debug("从数据库中读取角色列表，完成！");
+
+        log.debug("准备将角色列表写入到Redis缓存...");
+        roleRedisRepository.save(listToRole);
+        log.debug("将角色列表写入到Redis缓存，完成！");
+
+        log.debug("准备将各角色详情写入Redis缓存...");
+        for (Role role : listToRole) {
+            Long id = role.getId();
+            Role roleStandardVO = roleMapper.selectById(id);
+            roleRedisRepository.save(roleStandardVO);
+        }
+        log.debug("将各角色详情写入到Redis缓存中,完成!");
+    }
 }

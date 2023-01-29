@@ -187,4 +187,17 @@ public class UserController {
         userService.setDisable(id);
         return JsonResult.ok();
     }
+
+    /**
+     * 重建用户缓存
+     * @return 返回结果集
+     */
+    @ApiOperation("重建用户缓存")
+    @ApiOperationSupport(order = 502)
+    @GetMapping("/cache/rebuild")
+    public JsonResult<Void> rebuildCache(){
+        log.debug("开始处理[重建缓存]的请求,无参数");
+        userService.rebuildCache();
+        return JsonResult.ok();
+    }
 }
