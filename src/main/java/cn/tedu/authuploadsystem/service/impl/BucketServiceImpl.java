@@ -4,6 +4,7 @@ import cn.tedu.authuploadsystem.ex.ServiceException;
 import cn.tedu.authuploadsystem.pojo.entity.Body;
 import cn.tedu.authuploadsystem.pojo.entity.Bucket;
 import cn.tedu.authuploadsystem.pojo.entity.Tag;
+import cn.tedu.authuploadsystem.repo.IBucketRedisRepository;
 import cn.tedu.authuploadsystem.service.IBucketService;
 import cn.tedu.authuploadsystem.util.BASE64Encoder;
 import cn.tedu.authuploadsystem.web.ServiceCode;
@@ -16,6 +17,7 @@ import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +46,10 @@ public class BucketServiceImpl implements IBucketService {
     // 地域值
     @Value("${auth.key.storageArea}")
     private String storageArea;
+
+    // 注入Bucket的缓存接口类
+    @Autowired
+    private IBucketRedisRepository bucketRedisRepository;
 
     public BucketServiceImpl() {
         log.debug("创建业务层接口实现类：BucketServiceImpl");
@@ -137,6 +143,12 @@ public class BucketServiceImpl implements IBucketService {
     @Override
     public List<Bucket> bucketList(String bucketName) {
         log.debug("开始处理查询存储空间：{}的文件列表", bucketName);
+        List<Bucket> list = bucketRedisRepository.list();
+        log.debug("结果：{}",list);
+        if (! list.isEmpty()){ // 判断List集合是否为空，也可以用list.size()方法
+            log.debug("命中缓存，即将返回！");
+            return list;
+        }
         //构造一个带指定Zone对象的配置类
         Configuration cfg = new Configuration(Zone.zone2());
         //...其他参数参考类注释

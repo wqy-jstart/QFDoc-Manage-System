@@ -1,7 +1,6 @@
 package cn.tedu.authuploadsystem.repo;
 
 import cn.tedu.authuploadsystem.pojo.entity.User;
-import cn.tedu.authuploadsystem.pojo.vo.UserStandardVO;
 
 import java.util.List;
 

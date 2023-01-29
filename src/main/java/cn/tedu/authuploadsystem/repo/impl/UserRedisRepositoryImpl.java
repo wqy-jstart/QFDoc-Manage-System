@@ -1,7 +1,6 @@
 package cn.tedu.authuploadsystem.repo.impl;
 
 import cn.tedu.authuploadsystem.pojo.entity.User;
-import cn.tedu.authuploadsystem.pojo.vo.UserStandardVO;
 import cn.tedu.authuploadsystem.repo.IUserRedisRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,9 @@ import java.util.Set;
 @Repository// 声明一个组件
 public class UserRedisRepositoryImpl implements IUserRedisRepository {
 
+    /**
+     * 注入redisTemplate
+     */
     @Autowired
     private RedisTemplate<String, Serializable> redisTemplate;
 
