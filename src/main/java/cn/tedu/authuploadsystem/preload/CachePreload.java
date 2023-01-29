@@ -25,7 +25,7 @@ import java.util.List;
  * @since 2023.1.28
  */
 @Slf4j
-@Component // 声明是一个组件类,在项目启动时被加载一次
+//@Component // 声明是一个组件类,在项目启动时被加载一次
 public class CachePreload implements ApplicationRunner {
 
     // 注入bucket文件的获取接口
@@ -59,12 +59,12 @@ public class CachePreload implements ApplicationRunner {
 
     // ApplicationRunner中的run()方法会在项目启动成功之后自动执行
     @Override
-    public void run(ApplicationArguments args){
+    public void run(ApplicationArguments args) {
         log.debug("CacheSchedule.run()");
         // 重建bucket空间的缓存
         log.debug("准备删除Redis缓存中的Bucket数据...");
         Long countToBucket = bucketRedisRepository.deleteAll();
-        log.debug("删除Redis缓存中的Bucket数据,完成,数量为：{}",countToBucket);
+        log.debug("删除Redis缓存中的Bucket数据,完成,数量为：{}", countToBucket);
 
         log.debug("准备从数据库中读取Bucket列表...");
         List<Bucket> listToBuckets = bucketService.bucketList("jstart");
@@ -77,7 +77,7 @@ public class CachePreload implements ApplicationRunner {
         // 重建用户的缓存
         log.debug("准备删除Redis缓存中的用户数据...");
         Long countToUser = userRedisRepository.deleteAll();// 清除缓存中的数据,防止缓存堆积过多,显示的列表数据冗余
-        log.debug("删除Redis缓存中的用户数据,完成,数量为：{}",countToUser);
+        log.debug("删除Redis缓存中的用户数据,完成,数量为：{}", countToUser);
 
         log.debug("准备从数据库中读取用户列表...");
         List<User> list = userMapper.selectList(null);
@@ -90,7 +90,7 @@ public class CachePreload implements ApplicationRunner {
         // 重建角色的缓存
         log.debug("准备删除Redis缓存中的角色数据...");
         Long countToRole = roleRedisRepository.deleteAll();// 清除缓存中的数据,防止缓存堆积过多,显示的列表数据冗余
-        log.debug("删除Redis缓存中的角色数据,完成,数量为：{}",countToRole);
+        log.debug("删除Redis缓存中的角色数据,完成,数量为：{}", countToRole);
 
         log.debug("准备从数据库中读取角色列表...");
         List<Role> listToRole = roleMapper.selectList(null);
